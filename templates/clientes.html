@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clientes</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../assets/css/clientes.css" rel="stylesheet">
+</head>
+<body>
+    <header class="navbar navbar-dark sticky-top flex-md-nowrap p-0 shadow">
+        <a class="navbar-brand col-md-3 col-lg-2 mr-0 px-3" href="#">Tienda de Perfumes</a>
+        <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-toggle="collapse" data-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </header>
+
+    <!-- Contenedor principal -->
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Barra lateral -->
+            <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block sidebar">
+                <div class="sidebar-sticky">
+                    <ul class="nav flex-column">
+                        <!-- Opción de inicio -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="dashboard.html">
+                                <span data-feather="home"></span>
+                                Inicio
+                            </a>
+                        </li>
+                        <!-- Opción de productos -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="productos.html">
+                                <span data-feather="file"></span>
+                                Productos
+                            </a>
+                        </li>
+                        <!-- Opción clientes -->
+                        <li class="nav-item">
+                            <a class="nav-link active" href="clientes.html">
+                                <span data-feather="users"></span>
+                                Clientes
+                            </a>
+                        </li>
+                        <!-- Opción empleados -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="empleados.html">
+                                <span data-feather="users"></span>
+                                Empleados
+                            </a>
+                        </li>
+                        <!-- Opción facturas -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="facturas.html">
+                                <span data-feather="shopping-cart"></span>
+                                Facturas
+                            </a>
+                        </li>
+                        <!-- Opción transacciones -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="transacciones.html">
+                                <span data-feather="layers"></span>
+                                Transacciones
+                            </a>
+                        </li>
+                        <!-- Opción reportes -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="reportes.html">
+                                <span data-feather="bar-chart-2"></span>
+                                Reportes
+                            </a>
+                        </li>
+                        <!-- Opción configuración -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="configuracion.html">
+                                <span data-feather="layers"></span>
+                                Configuración
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a id="logout" class="nav-link" href="#">Cerrar sesión</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Contenido principal -->
+            <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
+                <h1 class="h2">Listado de Clientes</h1>
+                <div class="row mb-3">
+                    <!-- Buscador y Filtros -->
+                    <div class="col-md-4">
+                        <input type="text" id="search" class="form-control" placeholder="Buscar clientes...">
+                    </div>
+                                        
+                </div>
+
+                <!-- Opciones de Gestión -->
+                <div class="row mb-3">
+                    <div class="col-md-12 text-right">
+                        <button class="btn btn-success" onclick="openClientModal()">Añadir Cliente</button>
+                    </div>
+                </div>
+
+                <!-- Listado de Clientes -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nombre</th>
+                                    <th>Número de Teléfono</th>
+                                    <th>Contacto</th>
+                                    <th>Historial de Compras</th>
+                                    <th>Preferencias</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="clientTable">
+                                <!-- Aquí se llenará dinámicamente con clientes -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal para Añadir/Editar Cliente -->
+    <div class="modal fade" id="clientModal" tabindex="-1" aria-labelledby="clientModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="clientModalLabel">Añadir Cliente</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="clientForm">
+                        <!-- Campo para el número de cedula del cliente -->
+                        <div class="form-group">
+                            <label for="clientCedula">Cédula</label>
+                            <input type="text" class="form-control" id="clientCedula" required>
+                        </div>
+                        <!-- Campo para el nombre del cliente -->
+                        <div class="form-group">
+                            <label for="clientName">Nombre</label>
+                            <input type="text" class="form-control" id="clientName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="clientPhone">Número de Teléfono</label>
+                            <input type="tel" class="form-control" id="clientPhone" required>
+                        </div>
+                        <!-- Campo para el contacto del cliente -->
+                        <div class="form-group">
+                            <label for="clientContact">Contacto</label>
+                            <input type="text" class="form-control" id="clientContact" required>
+                        </div>
+                        <!-- Campo para historial de compras -->
+                        <div class="form-group">
+                            <label for="clientHistory">Historial de Compras</label>
+                            <textarea class="form-control" id="clientHistory" rows="3" required></textarea>
+                        </div>
+                        <!-- Campo para las preferencias del cliente -->
+                        <div class="form-group">
+                            <label for="clientPreferens">Preferencias</label>
+                            <textarea class="form-control" id="clientPreferens" rows="4" required></textarea>
+                        </div>
+                        
+                        <!-- Botón para guardar el cliente -->
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="../assets/js/clientes.js"></script>
+</body>
+</html>

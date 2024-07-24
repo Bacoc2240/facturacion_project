@@ -1,0 +1,86 @@
+/* dashboard.css */
+
+/* Estilos para el header */
+header.navbar {
+    background-color: #edf9fb; /* Color más intenso para el header */
+    color: rgb(19, 18, 18); /* Texto negro */
+}
+
+/* Estilos para la barra lateral (sidebar) */
+.sidebar {
+    background-color: #edf9fb; /* Color barra lateral */
+    color: black; /* Texto blanco */
+    padding-top: 20px; /* Espaciado superior para bajar las clases */
+}
+
+/* Estilos para los enlaces de la barra lateral */
+.sidebar .nav-link {
+    color: rgb(18, 17, 17); /* Texto blanco */
+    margin-bottom: 10px; /* Espaciado inferior entre enlaces */
+}
+
+/* Enlace activo en la barra lateral */
+.sidebar .nav-link.active {
+    background-color: #a9c9ff; /* Color de fondo más intenso para el enlace activo */
+    border-radius: 5px; /* Bordes redondeados */
+}
+
+/* Estilos para el contenedor principal */
+.container-fluid {
+    padding-top: 20px; /* Espaciado superior */
+}
+
+/* Estilos para los títulos de la vista resumida con indicadores */
+.d-flex.justify-content-between.flex-wrap.flex-md-nowrap.align-items-center.pt-3.pb-2.mb-3.border-bottom {
+    background-color: #edf9fb; /* Incremento del tono del color de fondo */
+    padding: 10px; /* Espaciado interno */
+    border-radius: 5px; /* Bordes redondeados */
+}
+
+/* Estilos para las tarjetas (cards) */
+.card {
+    border: none; /* Sin borde */
+    border-radius: 10px; /* Bordes redondeados */
+    box-shadow: 0 2px 4px rgba(206, 53, 53, 0.1); /* Sombra para las tarjetas */
+}
+
+/* Estilos para los encabezados de las tarjetas */
+.card-header {
+    background-color: #d7d7d7; /* Color más intenso para el encabezado de las tarjetas */
+    color: black; /* Texto blanco */
+    font-weight: bold; /* Texto en negrita */
+    border-top-left-radius: 10px; /* Bordes redondeados */
+    border-top-right-radius: 10px; /* Bordes redondeados */
+}
+
+/* Estilos para el cuerpo de las tarjetas */
+.card-body {
+    background-color: white; /* Color de fondo blanco */
+    padding: 20px; /* Espaciado interno */
+}
+
+/* Estilos para la lista de tareas */
+.list-group-item {
+    border: none; /* Sin borde */
+    padding-left: 0; /* Sin espaciado a la izquierda */
+}
+
+/* Estilos para las alertas y notificaciones */
+.alert {
+    border-radius: 5px; /* Bordes redondeados */
+}
+
+/* Estilos para la gráfica */
+canvas {
+    max-width: 100%; /* Asegura que la gráfica no exceda el ancho del contenedor */
+}
+
+/* Estilos adicionales para botones */
+.btn {
+    border-radius: 5px; /* Bordes redondeados */
+}
+
+/* Estilos para formularios de input */
+.form-control {
+    border-radius: 5px; /* Bordes redondeados */
+}

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Productos</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../assets/css/productos.css" rel="stylesheet">
+</head>
+<body>
+    <header class="navbar navbar-dark sticky-top flex-md-nowrap p-0 shadow">
+        <a class="navbar-brand col-md-3 col-lg-2 mr-0 px-3" href="#">Tienda de Perfumes</a>
+        <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-toggle="collapse" data-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </header>
+    <!-- Contenedor principal -->
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Barra lateral -->
+            <nav class="col-md-3 col-lg-2 d-md-block sidebar">
+                <div class="sidebar-sticky">
+                    <ul class="nav flex-column">
+                        <!-- Opción de inicio -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="dashboard.html">
+                                <span data-feather="home"></span>
+                                Inicio
+                            </a>
+                        </li>
+                        <!-- Opción de productos -->
+                        <li class="nav-item">
+                            <a class="nav-link active" href="productos.html">
+                                <span data-feather="file"></span>
+                                Productos
+                            </a>
+                        </li>
+                        <!-- Opción clientes -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="clientes.html">
+                                <span data-feather="users"></span>
+                                Clientes
+                            </a>
+                        </li>
+                        <!-- Opción empleados -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="empleados.html">
+                                <span data-feather="users"></span>
+                                Empleados
+                            </a>
+                        </li>
+                        <!-- Opción facturas -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="facturas.html">
+                                <span data-feather="shopping-cart"></span>
+                                Facturas
+                            </a>
+                        </li>
+                        <!-- Opción reportes -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="transacciones.html">
+                                <span data-feather="bar-chart-2"></span>
+                                Transacciones
+                            </a>
+                        </li>
+                        <!-- Opción transacciones -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="reportes.html">
+                                <span data-feather="layers"></span>
+                                Reportes
+                            </a>
+                        </li>
+                        <!-- Opción configuración -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="configuracion.html">
+                                <span data-feather="layers"></span>
+                                Configuración
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a id="logout" class="nav-link" href="#" onclick="cerrarSesion()">Cerrar sesión</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Contenido principal -->
+            <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
+                <h1 class="h2">Listado de Productos</h1>
+                <div class="row mb-3">
+                    <!-- Buscador y Filtros -->
+                    <div class="col-md-4">
+                        <input type="text" id="search" class="form-control" placeholder="Buscar productos...">
+                    </div>
+                    <div class="col-md-3">
+                        <select id="generoFilter" class="form-control">
+                            <option value="">Filtrar por Género</option>
+                            <option value="hombre">Hombre</option>
+                            <option value="mujer">Mujer</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select id="priceFilter" class="form-control">
+                            <option value="">Filtrar por precio</option>
+                            <option value="low">Menos de $50.000</option>
+                            <option value="medium">$50.000 - $100.000</option>
+                            <option value="high">Más de $100.000</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-primary btn-block" onclick="filterProducts()">Filtrar</button>
+                    </div>
+                </div>
+
+                <!-- Opciones de Gestión -->
+                <div class="row mb-3">
+                    <div class="col-md-12 text-right">
+                        <button class="btn btn-success" onclick="openProductModal()">Añadir Producto</button>
+                    </div>
+                </div>
+
+                <!-- Listado de Productos -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Referencia</th>
+                                    <th>Nombre</th>
+                                    <th>Género</th>
+                                    <th>Precio</th>
+                                    <th>Stock</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="productTable">
+                                <!-- Aquí se llenará dinámicamente con productos -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal para Añadir/Editar Producto -->
+    <div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="productModalLabel">Añadir Producto</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="productForm">
+                        <!-- Campo para la referencia del producto -->
+                        <div class="form-group">
+                            <label for="productRef">Referencia</label>
+                            <input type="text" class="form-control" id="productRef" required>
+                        </div>
+                        <!-- Campo para el nombre del producto -->
+                        <div class="form-group">
+                            <label for="productName">Nombre del Producto</label>
+                            <input type="text" class="form-control" id="productName" required>
+                        </div>
+                        <!-- Campo para el género del producto -->
+                        <div class="form-group">
+                            <label for="productGenero">Género</label>
+                            <select class="form-control" id="productGenero" required>
+                                <option value="hombre">Hombre</option>
+                                <option value="mujer">Mujer</option>
+                            </select>
+                        </div>
+                        <!-- Campo para el precio del producto -->
+                        <div class="form-group">
+                            <label for="productPrice">Precio</label>
+                            <input type="number" class="form-control" id="productPrice" required>
+                        </div>
+                        <!-- Campo para el stock del producto -->
+                        <div class="form-group">
+                            <label for="productStock">Stock</label>
+                            <input type="number" class="form-control" id="productStock" required>
+                        </div>
+                        <!-- Botón para guardar el producto -->
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="../assets/js/productos.js"></script>
+    <script>
+        function cerrarSesion() {
+            // lógica para limpiar datos de sesión
+            window.location.href = 'login.html';
+        }
+    </script>
+</body>
+</html>

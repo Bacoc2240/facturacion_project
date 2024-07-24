@@ -1,0 +1,98 @@
+/* Estilo para el contenedor principal */
+.container-fluid {
+    padding: 20px;
+}
+
+/* Estilo para la barra lateral */
+.sidebar {
+    background-color: #edf9fb;
+    color: black; /* Texto negro */
+    padding-top: 20px; /* Espaciado superior para bajar las clases */
+    
+}
+
+.sidebar .nav-link {
+    color: rgb(18, 17, 17); /* Texto blanco */
+    margin-bottom: 10px; /* Espaciado inferior entre enlaces */
+}
+
+.sidebar .nav-link.active {
+    font-weight: bold;
+    background-color: #a9c9ff; /* Color de fondo más intenso para el enlace activo */
+    border-radius: 5px; /* Bordes redondeados */
+}
+
+/* Estilo para la tabla de productos */
+.table {
+    margin-top: 20px;
+}
+
+/* Reducir el ancho de la columna 'Acciones' */
+.table th:nth-child(6),
+.table td:nth-child(6) {
+    width: 20%;
+    text-align: center;
+}
+
+/* Estilo para el formulario de producto */
+#productForm .form-group {
+    margin-bottom: 15px;
+}
+
+/* Estilo para el modal */
+.modal-header {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.modal-title {
+    margin: 0 auto;
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+/* Estilo para el botón 'Añadir Producto' */
+.btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+}
+
+/* Estilo para los botones de la tabla */
+.table .btn {
+    padding: 5px 10px;
+    font-size: 14px;
+}
+
+.table .btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.table .btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #004085;
+}
+
+.table .btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.table .btn-danger:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
+}
+
+/* Estilo para el buscador y filtros */
+#search,
+#generoFilter,
+#priceFilter {
+    margin-bottom: 10px;
+}
