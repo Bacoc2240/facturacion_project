@@ -125,3 +125,10 @@ h1.h2 {
 .modal-footer .btn {
     width: 100px;
 }
+
+/* Estilos responsivos */
+@media (max-width: 767.98px) {
+    .sidebar {
+        top: 5rem;
+    }
+}

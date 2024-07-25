@@ -8,14 +8,6 @@
     <link href="../assets/css/facturas.css" rel="stylesheet">
 </head>
 <body>
-    <!-- Encabezado de la página -->
-    <header class="navbar navbar-dark sticky-top flex-md-nowrap p-0 shadow">
-        <a class="navbar-brand col-md-3 col-lg-2 mr-0 px-3" href="#">Tienda de Perfumes</a>
-        <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-toggle="collapse" data-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-    </header>
-
     <!-- Contenedor principal -->
     <div class="container-fluid">
         <div class="row">
@@ -24,7 +16,7 @@
                 <div class="sidebar-sticky">
                     <ul class="nav flex-column">
                         <li class="nav-item">
-                            <a class="nav-link" href="inicio.html">
+                            <a class="nav-link" href="dashboard.html">
                                 <span data-feather="home"></span>
                                 Inicio
                             </a>
@@ -120,41 +112,81 @@
 
     <!-- Modal para Añadir/Editar Factura -->
     <div class="modal fade" id="facturaModal" tabindex="-1" aria-labelledby="invoiceModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="invoiceModalLabel">Crear Factura</h5>
+                    <h5 class="modal-title" id="invoiceModalLabel">Crear/Editar Factura</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
                     <form id="facturaForm">
-                        <!-- Campo para el ID de la factura -->
-                        <div class="form-group">
-                            <label for="invoiceId">ID Factura</label>
-                            <input type="text" class="form-control" id="facturaId" required>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="facturaId">ID Factura</label>
+                                <input type="text" class="form-control" id="facturaId" required>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="fechaPago">Fecha de Pago</label>
+                                <input type="datetime-local" class="form-control" id="fechaPago" required>
+                            </div>
                         </div>
-                        <!-- Campo para el cliente -->
-                        <div class="form-group">
-                            <label for="invoiceClient">Cliente</label>
-                            <input type="text" class="form-control" id="idCliente" required>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="idCliente">ID Cliente</label>
+                                <input type="text" class="form-control" id="idCliente" required>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="nombreCliente">Nombre del Cliente</label>
+                                <input type="text" class="form-control" id="nombreCliente" required>
+                            </div>
                         </div>
-                        <!-- Campo para la fecha -->
-                        <div class="form-group">
-                            <label for="invoiceDate">Fecha</label>
-                            <input type="datetime-local" class="form-control" id="fechaPago" required>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="fechaVencimiento">Fecha de Vencimiento</label>
+                                <input type="date" class="form-control" id="fechaVencimiento" required>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="nombreVendedor">Nombre del Vendedor</label>
+                                <input type="text" class="form-control" id="nombreVendedor" required>
+                            </div>
                         </div>
-                        <!-- Campo para el total -->
                         <div class="form-group">
-                            <label for="invoiceTotal">Total</label>
-                            <input type="number" class="form-control" id="total" required>
+                            <label for="formaPago">Forma de Pago</label>
+                            <select class="form-control" id="formaPago" required>
+                                <option value="Efectivo">Efectivo</option>
+                                <option value="Tarjeta">Tarjeta</option>
+                                <option value="Transferencia">Transferencia</option>
+                            </select>
                         </div>
                         <div id="productosContainer">
                             <!-- Aquí se agregarán dinámicamente los campos de productos -->
                         </div>
-                        <!-- Botón para guardar la factura -->
-                        <button type="submit" class="btn btn-primary">Guardar</button>
+                        <button type="button" class="btn btn-secondary mb-3" onclick="agregarProducto()">Agregar Producto</button>
+                        <div class="form-row">
+                            <div class="form-group col-md-3">
+                                <label for="subtotal">Subtotal</label>
+                                <input type="number" class="form-control" id="subtotal" required>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label for="valorIVA">Valor IVA</label>
+                                <input type="number" class="form-control" id="valorIVA" required>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label for="descuento">Descuento</label>
+                                <input type="number" class="form-control" id="descuento" required>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label for="total">Total</label>
+                                <input type="number" class="form-control" id="total" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="totalLetras">Total en Letras</label>
+                            <input type="text" class="form-control" id="totalLetras" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Guardar Factura</button>
                     </form>
                 </div>
             </div>

@@ -109,3 +109,10 @@ h1.h2 {
     padding: 0.75rem;
     border-top: 1px solid #dee2e6;
 }
+
+/* Estilos responsivos */
+@media (max-width: 767.98px) {
+    .sidebar {
+        top: 5rem;
+    }
+}

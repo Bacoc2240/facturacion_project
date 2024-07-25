@@ -2,27 +2,44 @@
 
 // Datos iniciales de facturas (puedes sustituir esto por una fuente de datos real)
 let facturas = [
-    // Ejemplo de una factura
     {
         id: 'F001',
         fechaPago: '2024-07-22 14:00',
-        idCliente: 'C001',
+        idCliente: '90208976',
         nombreCliente: 'Juan Perez',
         fechaVencimiento: '2024-07-22',
-        nombreVendedor: 'Pedro Gomez',
+        nombreVendedor: 'Leidy Castillo',
         formaPago: 'Efectivo',
         productos: [
-            { unidades: 2, nombre: 'Producto 1', valorIVA: 1000, total: 12000 },
-            { unidades: 1, nombre: 'Producto 2', valorIVA: 500, total: 5500 }
+            { unidades: 2, nombre: 'Antomnio - 15ml', valorIVA: 0, total: 90000 },
+            { unidades: 1, nombre: 'Fresh Escape - 50ml', valorIVA: 0, total: 48000 }
         ],
-        subtotal: 15000,
-        valorIVA: 1500,
+        subtotal: 138000,
+        valorIVA: 0,
         descuento: 0,
-        total: 16500,
-        totalLetras: 'Dieciséis mil quinientos pesos'
+        total: 138000,
+        totalLetras: 'Ciento treinta y ocho mil pesos m/l'
+    },
+    {
+        id: 'F002',
+        fechaPago: '2024-07-22 14:50',
+        idCliente: '60789123',
+        nombreCliente: 'Ana Minta Gómez',
+        fechaVencimiento: '2024-07-22',
+        nombreVendedor: 'Leidy Castillo',
+        formaPago: 'Transferencia',
+        productos: [
+            { unidades: 1, nombre: 'Love Love Love - 80ml', valorIVA: 0, total: 130000 }
+        ],
+        subtotal: 130000,
+        valorIVA: 0,
+        descuento: 0,
+        total: 130000,
+        totalLetras: 'Ciento treinta mil pesos m/l'
     }
 ];
-// variables para el modo edición
+
+// Variables para el modo edición
 let editMode = false;
 let editFacturaRef = null;
 
@@ -33,8 +50,10 @@ const searchInput = document.getElementById('search');
 
 // Función para abrir el modal de creación de factura
 function openFacturaModal() {
-    facturaForm.reset(); // Limpiar el formulario
-    $('#facturaModal').modal('show'); // Mostrar el modal
+    editMode = false;
+    editFacturaRef = null;
+    facturaForm.reset();
+    $('#facturaModal').modal('show');
 }
 
 // Función para renderizar la tabla de facturas
@@ -70,7 +89,7 @@ facturaForm.addEventListener('submit', function(event) {
         fechaVencimiento: document.getElementById('fechaVencimiento').value,
         nombreVendedor: document.getElementById('nombreVendedor').value,
         formaPago: document.getElementById('formaPago').value,
-        productos: [], // Aquí irán los productos
+        productos: [],
         subtotal: parseFloat(document.getElementById('subtotal').value),
         valorIVA: parseFloat(document.getElementById('valorIVA').value),
         descuento: parseFloat(document.getElementById('descuento').value),
@@ -90,73 +109,89 @@ facturaForm.addEventListener('submit', function(event) {
     });
 
     if (editMode) {
-        facturas[editFacturaRef] = newFactura;
+        const index = facturas.findIndex(f => f.id === editFacturaRef);
+        if (index !== -1) {
+            facturas[index] = newFactura;
+        }
     } else {
         facturas.push(newFactura);
     }
 
-    $('#facturaModal').modal('hide'); // Ocultar el modal
-    renderFacturaTable(); // Renderizar la tabla de facturas
+    $('#facturaModal').modal('hide');
+    renderFacturaTable();
 });
 
 // Función para ver una factura
 function viewFactura(id) {
     const factura = facturas.find(f => f.id === id);
     if (factura) {
-        // Aquí puedes añadir el código para mostrar los detalles de la factura
+        // Aquí puedes implementar la lógica para mostrar los detalles de la factura
         console.log('Ver factura:', factura);
+        alert(`Detalles de la factura ${factura.id}:\n${JSON.stringify(factura, null, 2)}`);
     }
 }
 
 // Función para editar una factura
 function editFactura(id) {
-    const index = facturas.findIndex(f => f.id === id);
-    if (index !== -1) {
+    const factura = facturas.find(f => f.id === id);
+    if (factura) {
         editMode = true;
-        editFacturaRef = index;
-        const factura = facturas[index];
-    editMode = true;
-    editFacturaRef = index;
-    document.getElementById('facturaId').value = factura.id;
-    document.getElementById('nombreCliente').value = factura.nombreCliente;
-    document.getElementById('idCliente').value = factura.idCliente;
-    document.getElementById('fechaPago').value = factura.fechaPago;
-    document.getElementById('fechaVencimiento').value = factura.fechaVencimiento;
-    document.getElementById('nombreVendedor').value = factura.nombreVendedor;
-    document.getElementById('formaPago').value = factura.formaPago;
-    document.getElementById('subtotal').value = factura.subtotal;
-    document.getElementById('valorIVA').value = factura.valorIVA;
-    document.getElementById('descuento').value = factura.descuento;
-    document.getElementById('total').value = factura.total;
-    document.getElementById('totalLetras').value = factura.totalLetras;
-    }
-    // Renderizar productos en el formulario
-    const productosContainer = document.getElementById('productosContainer');
-    productosContainer.innerHTML = '';
-    factura.productos.forEach(producto => {
-        const productoRow = `
-            <div class="form-group row producto-row">
-                <div class="col-md-2">
-                    <input type="number" class="form-control producto-unidades" value="${producto.unidades}" required>
-                </div>
-                <div class="col-md-4">
-                    <input type="text" class="form-control producto-nombre" value="${producto.nombre}" required>
-                </div>
-                <div class="col-md-3">
-                    <input type="number" class="form-control producto-valorIVA" value="${producto.valorIVA}" required>
-                </div>
-                <div class="col-md-3">
-                    <input type="number" class="form-control producto-total" value="${producto.total}" required>
-                </div>
-            </div>
-        `;
-        productosContainer.insertAdjacentHTML('beforeend', productoRow);
-    });
+        editFacturaRef = id;
+        
+        // Llenar el formulario con los datos de la factura
+        document.getElementById('facturaId').value = factura.id;
+        document.getElementById('nombreCliente').value = factura.nombreCliente;
+        document.getElementById('idCliente').value = factura.idCliente;
+        document.getElementById('fechaPago').value = factura.fechaPago;
+        document.getElementById('fechaVencimiento').value = factura.fechaVencimiento;
+        document.getElementById('nombreVendedor').value = factura.nombreVendedor;
+        document.getElementById('formaPago').value = factura.formaPago;
+        document.getElementById('subtotal').value = factura.subtotal;
+        document.getElementById('valorIVA').value = factura.valorIVA;
+        document.getElementById('descuento').value = factura.descuento;
+        document.getElementById('total').value = factura.total;
+        document.getElementById('totalLetras').value = factura.totalLetras;
 
-    $('#facturaModal').modal('show'); // Mostrar el modal
+        // Renderizar productos en el formulario
+        const productosContainer = document.getElementById('productosContainer');
+        productosContainer.innerHTML = '';
+        factura.productos.forEach((producto, index) => {
+            agregarProducto();
+            const row = productosContainer.children[index];
+            row.querySelector('.producto-unidades').value = producto.unidades;
+            row.querySelector('.producto-nombre').value = producto.nombre;
+            row.querySelector('.producto-valorIVA').value = producto.valorIVA;
+            row.querySelector('.producto-total').value = producto.total;
+        });
+
+        $('#facturaModal').modal('show');
+    }
 }
 
-// Función para eliminar una factura con confirmación
+// Función para agregar un nuevo producto al formulario
+function agregarProducto() {
+    const productosContainer = document.getElementById('productosContainer');
+    const productoIndex = document.querySelectorAll('.producto-row').length;
+    const productoHTML = `
+        <div class="form-row producto-row">
+            <div class="form-group col-md-3">
+                <input type="number" class="form-control producto-unidades" placeholder="Unidades" required>
+            </div>
+            <div class="form-group col-md-3">
+                <input type="text" class="form-control producto-nombre" placeholder="Nombre" required>
+            </div>
+            <div class="form-group col-md-3">
+                <input type="number" class="form-control producto-valorIVA" placeholder="Valor IVA" required>
+            </div>
+            <div class="form-group col-md-3">
+                <input type="number" class="form-control producto-total" placeholder="Total" required>
+            </div>
+        </div>
+    `;
+    productosContainer.insertAdjacentHTML('beforeend', productoHTML);
+}
+
+// Función para eliminar una factura
 function deleteFactura(id) {
     if (confirm('¿Estás seguro de que deseas eliminar esta factura?')) {
         const index = facturas.findIndex(f => f.id === id);
@@ -177,30 +212,26 @@ searchInput.addEventListener('input', function() {
     renderFacturaTable(filteredFacturas);
 });
 
-// Inicialización de la tabla de facturas
-function renderFacturaTable(filteredFacturas = facturas) {
-    facturaTable.innerHTML = '';
-    filteredFacturas.forEach((factura, index) => {
-        const row = `
-            <tr>
-                <td>${factura.id}</td>
-                <td>${factura.nombreCliente}</td>
-                <td>${factura.fechaPago}</td>
-                <td>${factura.total}</td>
-                <td>
-                    <button class="btn btn-primary btn-sm" onclick="viewFactura(${index})">Ver</button>
-                    <button class="btn btn-warning btn-sm" onclick="editFactura(${index})">Editar</button>
-                    <button class="btn btn-danger btn-sm" onclick="deleteFactura(${index})">Eliminar</button>
-                </td>
-            </tr>
-        `;
-        facturaTable.insertAdjacentHTML('beforeend', row);
-    });
-}
-
 // Renderizar la tabla de facturas al cargar la página
 document.addEventListener('DOMContentLoaded', function() {
-    renderFacturaTable(facturas);
+    renderFacturaTable();
+});
+
+// Función para cerrar sesión
+function cerrarSesion() {
+    // añadir lógica para cerrar sesión
+    // como limpiar datos de sesión, cookies, etc.
+
+    // Redirigir al usuario a la página de login
+    window.location.href = 'login.html';
+}
+
+// Event listener para el enlace de cerrar sesión
+$(document).ready(function() {
+    $('#logout').on('click', function(e) {
+        e.preventDefault(); // Prevenir el comportamiento predeterminado del enlace
+        cerrarSesion();
+    });
 });
 
 
