@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}PerfumEasy{% endblock %}</title>
+    
+    <!-- Cargamos Bootstrap CSS desde un CDN -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    
+    <!-- Estilos comunes -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    
+    <!-- Estilos específicos de la página -->
+    {% block page_css %}{% endblock %}
+</head>
+<body>
+        
+    <main class="container-fluid mt-4">
+        {% block content %}
+        {% endblock %}
+    </main>
+    
+    <footer class="mt-5">
+        <!-- Pie de página, opcional -->
+    </footer>
+    
+    <!-- Cargamos jQuery desde un CDN -->
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    
+    <!-- Cargamos Bootstrap JS desde un CDN -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    
+    <!-- Cargamos Chart.js desde un CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Scripts comunes 
+    <script src="{{ url_for('static', filename='js/common.js') }}"></script> -->
+    
+    <!-- Scripts específicos de la página -->
+    {% block page_js %}{% endblock %}
+</body>
+</html>
+
+

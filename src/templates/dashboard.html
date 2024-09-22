@@ -1,152 +1,88 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
-    <!-- Enlace a CSS de Bootstrap -->
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Enlace a tu CSS personalizado -->
-    <link href="../static/css/dashboard.css" rel="stylesheet">
-</head>
-<body>
-    <!-- Encabezado -->
-    <header class="navbar navbar-expand-lg navbar-light">
-        <a class="navbar-brand" href="#">
-            <img src="../static/images/logo.jpeg" alt="Logo" width="30" height="30" class="d-inline-block align-top">
-            Tienda de Perfumes
-        </a>
-        <div class="collapse navbar-collapse">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Perfil</a>
-                </li>
-                <li class="nav-item">
-                    <a id="logout" class="nav-link" href="#">Cerrar sesión</a>
-                </li>
-            </ul>
-        </div>
-    </header>
+{% extends "layout.html" %}
 
-    <!-- Contenedor principal -->
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Barra lateral -->
-            <nav class="col-md-3 col-lg-2 d-md-block sidebar">
-                <div class="sidebar-sticky">
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link active" href="#">Inicio</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/productos">
-                                <span data-feather="file"></span>
-                                Productos
-                            </a>
-                        </li>
-                        <!-- Opción clientes -->
-                        <li class="nav-item">
-                            <a class="nav-link" href="/clientes">
-                                <span data-feather="users"></span>
-                                Clientes
-                            </a>
-                        </li>
-                        <!-- Opción empleados -->
-                        <li class="nav-item">
-                            <a class="nav-link" href="/empleados">
-                                <span data-feather="users"></span>
-                                Empleados
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/facturas">
-                                <span data-feather="users"></span>
-                                Facturas
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">Transacciones</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">Reportes</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">Configuración</a>
-                        </li>
+{% block title %}Dashboard - PerfumEasy{% endblock %}
+
+{% block page_css %}
+    <!-- Archivo CSS específico para la página del dashboard -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+            <div class="sidebar-sticky">
+                <ul class="nav flex-column">
+                    <!-- Usamos url_for para generar las URLs de manera dinámica -->
+                    <li class="nav-item"><a class="nav-link active" href="{{ url_for('dashboard') }}">Inicio</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('productos') }}">Productos</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('clientes') }}">Clientes</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('empleados') }}">Empleados</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('facturas') }}">Facturas</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('transacciones') }}">Transacciones</a></li>
+                    <!-- Añadir rutas para Reportes y Configuración cuando estén implementadas -->
+                    <li class="nav-item"><a class="nav-link" href="#">Reportes</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Configuración</a></li>
+                    <li class="nav-item"><a id="logout" class="nav-link" href="{{ url_for('logout') }}">Cerrar sesión</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">Indicadores Clave</h1>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card mb-4 shadow-sm">
+                        <div class="card-header">Ventas Diarias</div>
+                        <div class="card-body">
+                            <!-- Agregar aquí un gráfico o datos de ventas diarias -->
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card mb-4 shadow-sm">
+                        <div class="card-header">Productos Más Vendidos</div>
+                        <div class="card-body">
+                            <!-- Aquí voy a agregar una lista de productos más vendidos -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header">Tareas Pendientes</div>
+                <div class="card-body">
+                    <ul>
+                        <li>Actualizar inventario de perfumes</li>
+                        <li>Contactar nuevos proveedores</li>
+                        <li>Revisar facturas pendientes</li>
                     </ul>
                 </div>
-            </nav>
+            </div>
 
-            <!-- Panel Principal -->
-            <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
-                <!-- Vista Resumida con indicadores clave -->
-                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h1 class="h2">Indicadores Clave</h1>
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header">Alertas y Notificaciones</div>
+                <div class="card-body">
+                    <div class="alert alert-warning">Inventario bajo para el perfume "Eau de Parfum".</div>
+                    <div class="alert alert-info">Nueva oferta de proveedor disponible.</div>
                 </div>
-
-                <!-- Gráficas y Estadísticas -->
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="card mb-4 shadow-sm">
-                            <div class="card-header">
-                                Ventas Diarias
-                            </div>
-                            <div class="card-body">
-                                <!-- Placeholder para gráfica -->
-                                <canvas id="dailySalesChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="card mb-4 shadow-sm">
-                            <div class="card-header">
-                                Productos Más Vendidos
-                            </div>
-                            <div class="card-body">
-                                <!-- Placeholder para gráfica -->
-                                <canvas id="topProductsChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Lista de Tareas -->
-                <div class="card mb-4 shadow-sm">
-                    <div class="card-header">
-                        Tareas Pendientes
-                    </div>
-                    <div class="card-body">
-                        <ul class="list-group list-group-flush">
-                            <li class="list-group-item">Actualizar inventario de perfumes</li>
-                            <li class="list-group-item">Contactar nuevos proveedores</li>
-                            <li class="list-group-item">Revisar facturas pendientes</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- Alertas y Notificaciones -->
-                <div class="card mb-4 shadow-sm">
-                    <div class="card-header">
-                        Alertas y Notificaciones
-                    </div>
-                    <div class="card-body">
-                        <div class="alert alert-warning" role="alert">
-                            Inventario bajo para el perfume "Eau de Parfum".
-                        </div>
-                        <div class="alert alert-info" role="alert">
-                            Nueva oferta de proveedor disponible.
-                        </div>
-                    </div>
-                </div>
-            </main>
-        </div>
+            </div>
+        </main>
     </div>
+</div>
+{% endblock %}
 
-    <!-- Enlaces a JavaScript de Bootstrap, Chart.js y tus scripts personalizados -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="../static/js/dashboard.js"></script>
-</body>
-</html>
+{% block page_js %}
+    <!-- Archivo JS específico para el dashboard -->
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+
+    <script>
+        function cerrarSesion() {
+            // Lógica para limpiar datos de sesión
+            window.location.href = '/';
+        }
+    </script>
+{% endblock %}

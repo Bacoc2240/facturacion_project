@@ -1,29 +1,21 @@
 /* login.css */
 
+/* Estilos específicos para login */
 body {
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
     margin: 0;
-    font-family: Arial, sans-serif;
-    background-color: #f0f0f0;
-}
-
-.container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
 }
 
 .login-container {
-    width: 30%;
-    padding: 2rem;
-    background-color: #fff;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    border-radius: 8px;
+    width: 30% !important;
+    padding: 2rem !important;
+    background-color: #fff !important;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1)!important;
+    text-align: center !important;
+    border-radius: 8px !important;
 }
 
 .login-container img {
@@ -36,69 +28,45 @@ body {
     justify-content: center;
     display: block;
     margin: 0 auto;
-    width: 180px; /* Ajusta el ancho según sea necesario */
-    height: 180px; /* Ajusta la altura según sea necesario */
-    border: 2px solid #ddd; /* Añade un borde */
-    border-radius: 10px; /* Añade bordes redondeados */
-    padding: 10px; /* Añade padding alrededor de la imagen */
-    background-color: #fff; /* Fondo blanco detrás de la imagen */
+    width: 180px !important;
+    height: 180px !important;
+    border: 2px solid #ddd !important;
+    border-radius: 10px !important;
+    padding: 10px !important;
+    background-color: #fff !important;
 }
 
-.form-group {
-    margin-bottom: 1rem;
-    text-align: left;
-    
+.login-container .form-group input {
+    width: 80% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    padding: 0.5rem !important;
+    border: 1px solid #ccc !important;
+    border-radius: 12px !important;
 }
 
-.form-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-}
-
-/* campos de entrada */
-.form-group input {
-    width: 80%; /* Ancho campos de entrada*/
-    margin-left: auto;/* Automargin para centrar horizontalmente */
-    margin-right: auto; /* Automargin para centrar horizontalmente */
-    padding: 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 12px;
-    
-}
-
-/* botón de login */
-.btn-primary {
-    justify-content: center;
-    width: 80%; /* Ancho del botón*/
-    margin-left: auto; /* Automargin para centrar horizontalmente */
-    margin-right: auto; /* Automargin para centrar horizontalmente */
+.login-container .btn-primary {
+    width: 80% !important;
+    margin-left: auto;
+    margin-right: auto;
     padding: 0.75rem;
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
+    border-radius: 12px !important;
     font-size: 1rem;
 }
 
-.btn-login:hover {
-    background-color: #0056b3;
-}
-
-.forgot-password {
+.login-container .forgot-password {
     display: block;
     margin-top: 1rem;
-    color: #007bff;
+    color: #007bff !important;
     text-decoration: underline;
 }
 
-.forgot-password:hover {
-    color: #0056b3;
+.login-container .forgot-password:hover {
+    color: #0056b3 !important;
 }
 
-/* Estilos responsivos */
 @media (max-width: 767.98px) {
-    .sidebar {
-        top: 5rem;
+    .login-container {
+        width: 90% !important;
     }
 }

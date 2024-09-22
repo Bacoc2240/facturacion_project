@@ -1,79 +1,31 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clientes</title>
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <link href="../static/css/clientes.css" rel="stylesheet">
-</head>
-<body>
-    <!-- Contenedor principal -->
+{% extends "layout.html" %}
+
+{% block title %}Productos - PerfumEasy{% endblock %}
+
+{% block page_css %}
+    <!-- Archivo CSS específico para la página del dashboard -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/clientes.css') }}">
+{% endblock %}
+
+<!-- Contenedor principal -->
+{% block content %}
     <div class="container-fluid">
         <div class="row">
             <!-- Barra lateral -->
-            <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block sidebar">
+            <nav class="col-md-2 d-none d-md-block bg-light sidebar">
                 <div class="sidebar-sticky">
                     <ul class="nav flex-column">
-                        <!-- Opción de inicio -->
-                        <li class="nav-item">
-                            <a class="nav-link" href="/dashboard">
-                                <span data-feather="home"></span>
-                                Inicio
-                            </a>
-                        </li>
-                        <!-- Opción de productos -->
-                        <li class="nav-item">
-                            <a class="nav-link" href="/productos">
-                                <span data-feather="file"></span>
-                                Productos
-                            </a>
-                        </li>
-                        <!-- Opción clientes -->
-                        <li class="nav-item">
-                            <a class="nav-link active" href="/clientes">
-                                <span data-feather="users"></span>
-                                Clientes
-                            </a>
-                        </li>
-                        <!-- Opción empleados -->
-                        <li class="nav-item">
-                            <a class="nav-link" href="/empleados">
-                                <span data-feather="users"></span>
-                                Empleados
-                            </a>
-                        </li>
-                        <!-- Opción facturas -->
-                        <li class="nav-item">
-                            <a class="nav-link" href="/facturas">
-                                <span data-feather="shopping-cart"></span>
-                                Facturas
-                            </a>
-                        </li>
-                        <!-- Opción transacciones -->
-                        <li class="nav-item">
-                            <a class="nav-link" href="/transacciones">
-                                <span data-feather="layers"></span>
-                                Transacciones
-                            </a>
-                        </li>
-                        <!-- Opción reportes -->
-                        <li class="nav-item">
-                            <a class="nav-link" href="/reportes">
-                                <span data-feather="bar-chart-2"></span>
-                                Reportes
-                            </a>
-                        </li>
-                        <!-- Opción configuración -->
-                        <li class="nav-item">
-                            <a class="nav-link" href="/configuracion">
-                                <span data-feather="layers"></span>
-                                Configuración
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a id="logout" class="nav-link" href="#">Cerrar sesión</a>
-                        </li>
+                        <!-- Usamos url_for para generar las URLs de manera dinámica -->
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}">Inicio</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('productos') }}">Productos</a></li>
+                        <li class="nav-item"><a class="nav-link active" href="{{ url_for('clientes') }}">Clientes</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('empleados') }}">Empleados</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('facturas') }}">Facturas</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('transacciones') }}">Transacciones</a></li>
+                        <!-- Añadir rutas para Reportes y Configuración cuando estén implementadas -->
+                        <li class="nav-item"><a class="nav-link" href="#">Reportes</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#">Configuración</a></li>
+                        <li class="nav-item"><a id="logout" class="nav-link" href="{{ url_for('logout') }}">Cerrar sesión</a></li>
                     </ul>
                 </div>
             </nav>
@@ -99,7 +51,7 @@
                 <!-- Listado de Clientes -->
                 <div class="row">
                     <div class="col-md-12">
-                        <table class="table table-bordered table-striped">
+                        <table class="table table-clientes table-bordered table-striped">
                             <thead>
                                 <tr>
                                     <th>ID</th>
@@ -171,9 +123,16 @@
         </div>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="../static/js/clientes.js"></script>
-</body>
-</html>
+{% endblock %}
+
+{% block page_js %}
+    <!-- Archivo JS específico para productos -->
+    <script src="{{ url_for('static', filename='js/clientes.js') }}"></script>
+    
+    <script>
+        function cerrarSesion() {
+            // Lógica para limpiar datos de sesión
+            window.location.href = '/';
+        }
+    </script>
+{% endblock %}

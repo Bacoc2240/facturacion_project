@@ -5,7 +5,7 @@ let clientes = [
         nombre: 'Juan Pérez',
         telefono: '3113452244',
         contacto: 'juan.perez@example.com',
-        historial: 'Compras recientes: Acqua de Gio -100ml, spirit - 30ml',
+        historial: 'Acqua de Gio -100ml, spirit - 30ml',
         preferencias: 'spirit - 30ml'
     },
     {
@@ -13,7 +13,7 @@ let clientes = [
         nombre: 'Ana Gómez',
         telefono: '3009687854',
         contacto: 'ana.gomez@example.com',
-        historial: 'Compras recientes: 90210 sport - 100ml',
+        historial: '90210 sport - 100ml',
         preferencias: 'idole - 75ml'
         
     },
@@ -22,7 +22,7 @@ let clientes = [
         nombre: 'Raul Rojas',
         telefono: '3017724351',
         contacto: 'raul.rojas@example.com',
-        historial: 'Compras recientes: Antonio - 15ml, spirit - 30ml',
+        historial: 'Antonio - 15ml, spirit - 30ml',
         preferencias: 'idole - 75ml'
     }
 

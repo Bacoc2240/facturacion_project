@@ -1,108 +1,29 @@
 /* Archivo: clientes.css */
 
-/* Estilo básico para el contenedor principal */
-.container-fluid {
-    padding: 20px;
+/* Ajustes de ancho para columnas específicas */
+.table-clientes th:nth-child(1),
+.table-clientes td:nth-child(1) {
+    width: 9%;
+    text-align: center;
 }
 
-/* Título principal de la sección */
-h1.h2 {
-    margin-bottom: 20px;
-}
-
-/* Estilo para la barra lateral */
-.sidebar {
-    background-color: #edf9fb;
-    color: black; /* Texto negro */
-    padding-top: 20px; /* Espaciado superior para bajar las clases */
-    
-}
-
-.sidebar .nav-link {
-    color: rgb(18, 17, 17); /* Texto blanco */
-    margin-bottom: 10px; /* Espaciado inferior entre enlaces */
-}
-
-.sidebar .nav-link.active {
-    font-weight: bold;
-    background-color: #a9c9ff; /* Color de fondo más intenso para el enlace activo */
-    border-radius: 5px; /* Bordes redondeados */
-}
-
-
-/* Estilo para la tabla de clientes */
-.table {
-    width: 100%;
-    margin-bottom: 1rem;
-    color: #212529;
-    margin-top: 20px;
-}
-.table th,
-.table td {
-    padding: 0.75rem;
-    vertical-align: top;
-    border-top: 1px solid #dee2e6;
-}
-/* Encabezado de la tabla */
-.table thead th {
-    vertical-align: bottom;
-    border-bottom: 2px solid #dee2e6;
-}
-
-
-
-/* Reducir el ancho de la columna 'Acciones' */
-.table th:nth-child(7),
-.table td:nth-child(7) {
+.table-clientes th:nth-child(2),
+.table-clientes td:nth-child(2) {
     width: 14%;
     text-align: center;
 }
 
-/* Reducir el ancho de la columna 'Teléfono' */
-.table th:nth-child(3),
-.table td:nth-child(3) {
-    width: 12%;
-    text-align: center;
-}
-
-/* Manejar el ancho columna ID' */
-.table th:nth-child(1),
-.table td:nth-child(1) {
-    width: 10%;
-    text-align: center;
-}
-/* Ajuste de ancho para la columna Historial >compras*/ 
-.table th:nth-child(5),
-.table td:nth-child(5) {
+.table-clientes th:nth-child(5),
+.table-clientes td:nth-child(5) {
     width: 19%;
     text-align: center;
 }
 
-/* Estilo para el campo de búsqueda */
-#search {
-    width: 100%;
-    padding: 0.375rem 0.75rem;
-    margin-bottom: 1rem;
-    border: 1px solid #ced4da;
-    border-radius: 0.25rem;
-    
-}
-
-/* Botones de acciones */
-.btn-warning {
-    background-color: #ffc107;
-    border-color: #ffc107;
-}
-
-.btn-danger {
-    background-color: #dc3545;
-    border-color: #dc3545;
-}
-
-/* Estilo para los botones de acciones dentro de la tabla */
-.table .btn {
-    padding: 4px 8px;
-    font-size: 12px;
+.table-clientes th:nth-child(7),
+.table-clientes td:nth-child(7) {
+    width: 18%;
+    text-align: center;
+    white-space: nowrap;
 }
 
 /* Estilo para el formulario dentro del modal */
@@ -110,25 +31,8 @@ h1.h2 {
     margin-bottom: 15px;
 }
 
-/* Estilo para el modal */
-.modal-content {
-    padding: 20px;
-}
-
 /* Ajuste para el título del modal */
 .modal-title {
     font-size: 20px;
     margin-bottom: 10px;
-}
-
-/* Estilo para los botones dentro del modal */
-.modal-footer .btn {
-    width: 100px;
-}
-
-/* Estilos responsivos */
-@media (max-width: 767.98px) {
-    .sidebar {
-        top: 5rem;
-    }
 }
