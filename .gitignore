@@ -1,3 +1,21 @@
+# Ignorar el entorno virtual
 venv/
+.venv/
+
+# Ignorar archivos de configuración de VSCode
+.vscode/
+
+# Ignorar archivos de caché de Python
 __pycache__/
 *.pyc
+
+# Ignorar archivos de log
+*.log
+
+# Ignorar archivos específicos de macOS y Windows
+*.DS_Store
+Thumbs.db
+
+# Otros archivos sensibles o locales
+.env
+*.sqlite3
