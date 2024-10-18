@@ -1,12 +1,28 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session
 from functools import wraps
+from src.models import Base, engine
+from src.models.productos import Productos
+from src.models.categorias import Categorias
+from src.models.cliente import Cliente
+from src.models.detalle_factura import DetalleFactura
+from src.models.empleado import Empleado
+from src.models.factura import Factura
+from src.models.metodo_de_pago import MetodoDePago
+from src.models.promocion import Promocion
+from src.models.resolucion_dian import ResolucionDIAN
+from src.models.transaccion import Transaccion
+from src.models.usuario import Usuario
 
 app = Flask(__name__, 
             static_folder='static', 
             template_folder='templates')
 
+
+Base.metadata.create_all(engine)
+
 # Configur una clave para la sesión (Debo cambiarla en producción)
-app.secret_key = 'tu_clave_secreta_aqui'
+app.secret_key = 'miadsof'
+app.debug = True
 
 # verificar si el usuario está logueado
 def login_required(f):
