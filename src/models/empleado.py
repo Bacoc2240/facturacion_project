@@ -15,7 +15,7 @@ class Empleado(Base):
     activo = Column(Boolean, default=True)  
     fecha_activacion = Column((Date), nullable=False) 
 
-    facturas = relationship('Factura', back_populates='empleado')
+    factura = relationship('Factura', back_populates='empleado')
     usuario = relationship('Usuario', back_populates='empleado', uselist=False)
 
     def __init__(self, nombre_apellidos, numero_identificacion, correo_electronico, telefono, fecha_contratacion, cargo):

@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, Text
+from sqlalchemy.orm import relationship
 from src.models import session, Base
 from sqlalchemy.orm import validates
 from sqlalchemy.exc import IntegrityError
@@ -24,6 +25,9 @@ class Cliente(Base):
         self.telefono = telefono
         self.correo_electronico = correo_electronico
         self.historial_compras = historial_compras
+        
+    # Relación con la tabla Factura
+    factura = relationship('Factura', back_populates='cliente')
 
     # Validación para el tipo de documento
     @validates('tipo_documento')

@@ -15,7 +15,7 @@ class Promocion(Base):
     estado = Column(String(45), nullable=False)
 
     # Relación con la clase Factura
-    facturas = relationship('Factura', back_populates='promocion')
+    factura = relationship('Factura', back_populates='promocion')
 
     # Constructor del modelo
     def __init__(self, nombre_promocion, fecha_inicio, fecha_fin, porcentaje_descuento, estado, descripcion=None):

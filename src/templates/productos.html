@@ -68,16 +68,29 @@
                         <table class="table table-bordered table-striped">
                             <thead>
                                 <tr>
-                                    <th>Referencia</th>
+                                    <th>Id</th>
                                     <th>Nombre</th>
                                     <th>Género</th>
-                                    <th>Precio</th>
+                                    <th>Descripción</th>
                                     <th>Stock</th>
+                                    <th>Precio</th>
+                                    <th>Categoria</th>
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
-                            <tbody id="productTable">
-                                <!-- Aquí se llenará dinámicamente con productos -->
+                            <tbody >
+                                <!-- Itera sobre la lista de productos -->
+                                {% for producto in productos %}
+                                <tr>
+                                    <td>{{ producto.id }}</td>
+                                    <td>{{ producto.nombre }}</td>
+                                    <td>{{ producto.genero }}</td>
+                                    <td>{{ producto.descripcion }}</td>
+                                    <td>{{ producto.stock }}</td>
+                                    <td>{{ producto.precio }}</td>
+                                    <td>{{ producto.categoria }}</td>
+                                </tr>
+                                {% endfor %}
                             </tbody>
                         </table>
                     </div>
@@ -98,17 +111,13 @@
                 </div>
                 <div class="modal-body">
                     <form id="productForm">
-                        <!-- Campo para la referencia del producto -->
+                        <!-- Campo para Nombre del producto -->
                         <div class="form-group">
-                            <label for="productRef">Referencia</label>
+                            <label for="productRef">Nombre</label>
                             <input type="text" class="form-control" id="productRef" required>
                         </div>
-                        <!-- Campo para el nombre del producto -->
-                        <div class="form-group">
-                            <label for="productName">Nombre del Producto</label>
-                            <input type="text" class="form-control" id="productName" required>
-                        </div>
-                        <!-- Campo para el género del producto -->
+
+                        <!-- Campo para Genero  -->
                         <div class="form-group">
                             <label for="productGenero">Género</label>
                             <select class="form-control" id="productGenero" required>
@@ -116,16 +125,25 @@
                                 <option value="mujer">Mujer</option>
                             </select>
                         </div>
-                        <!-- Campo para el precio del producto -->
+
+                        <!-- Campo para Descripción del producto -->
                         <div class="form-group">
-                            <label for="productPrice">Precio</label>
-                            <input type="number" class="form-control" id="productPrice" required>
+                            <label for="productName">Descripción</label>
+                            <input type="text" class="form-control" id="productName" required>
                         </div>
+
                         <!-- Campo para el stock del producto -->
                         <div class="form-group">
                             <label for="productStock">Stock</label>
                             <input type="number" class="form-control" id="productStock" required>
                         </div>
+                        
+                        <!-- Campo para el precio del producto -->
+                        <div class="form-group">
+                            <label for="productPrice">Precio</label>
+                            <input type="number" class="form-control" id="productPrice" required>
+                        </div>
+                        
                         <!-- Botón para guardar el producto -->
                         <button type="submit" class="btn btn-primary">Guardar</button>
                     </form>

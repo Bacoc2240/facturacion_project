@@ -27,7 +27,7 @@ class Factura(Base):
     total = Column(Float(10, 2), nullable=False)
     IVA = Column(Float(10, 2), nullable=False)
     descuento_aplicado = Column(Float(10, 2))
-    id_cliente = Column(String, ForeignKey('cliente.id_cliente'), nullable=False)
+    id_cliente = Column(String(20), ForeignKey('cliente.id_cliente'), nullable=False)
     id_empleado = Column(Integer, ForeignKey('empleado.id_empleado'), nullable=False)
     id_promocion = Column(Integer, ForeignKey('promocion.id_promocion'))
     id_resolucion = Column(Integer, ForeignKey('resolucion_dian.id_resolucion'), nullable=False)
