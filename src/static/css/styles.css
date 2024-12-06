@@ -54,34 +54,40 @@ h1.h2 {
     border-bottom: 2px solid #dee2e6;
 }
 
-/* Botones */
+/* Estilos base para todos los botones */
 .btn {
     border-radius: 5px;
+    padding: 8px 16px;    /* Padding uniforme */
+    margin-right: 10px;   /* Separación entre botones */
+    min-width: 100px;     /* Ancho mínimo para uniformidad */
+    display: inline-block; /* Asegura comportamiento consistente */
+    text-align: center;   /* Centra el texto */
+    font-size: 14px;      /* Tamaño de fuente uniforme */
+    transition: all 0.3s ease; /* Transición suave para hover */
 }
 
+/* Asegura que el último botón no tenga margen derecho si está en línea */
+.btn:last-child {
+    margin-right: 0;
+}
+
+/* Ajustes para los botones existentes */
 .btn-primary {
     background-color: #007bff;
     border-color: #007bff;
-}
-
-.btn-primary:hover {
-    background-color: #0056b3;
-    border-color: #004085;
+    color: white;         /* Asegura texto blanco */
 }
 
 .btn-warning {
     background-color: #ffc107;
     border-color: #ffc107;
+    color: #212529;       /* Color oscuro para contraste */
 }
 
 .btn-danger {
     background-color: #dc3545;
     border-color: #dc3545;
-}
-
-.btn-danger:hover {
-    background-color: #c82333;
-    border-color: #bd2130;
+    color: white;
 }
 
 /* Añadido de productos.css */

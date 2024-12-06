@@ -15,22 +15,22 @@ class Transaccion(Base):
     # Relación con Factura
     factura = relationship('Factura', back_populates='transacciones')
 
-    def __init__(self, fecha, tipo, monto, id):
+    def __init__(self, fecha, tipo, monto, id_factura):
         self.Fecha = fecha
         self.Tipo = tipo
         self.Monto = monto
 
         # Verificar si la factura asociada existe
-        factura = session.query(Factura).filter_by(id_factura=id).first()
+        factura = session.query(Factura).filter_by(id_factura=id_factura).first()
         if factura:
-            self.ID_Factura = id
+            self.ID_Factura = id_factura
         else:
             raise ValueError("La factura asociada no existe.")
 
     # Método para asociar la transacción a una factura
     def asociar_a_factura(self, factura):
         if isinstance(factura, Factura):
-            self.ID_Factura = factura.id
+            self.ID_Factura = factura.id_factura
         else:
             raise ValueError("El objeto proporcionado no es una instancia de Factura.")
 
@@ -56,3 +56,8 @@ class Transaccion(Base):
         if self.ID_Factura:
             return True
         return False
+
+    # Guardar cambios en la base de datos
+    def guardar(self):
+        session.add(self)
+        session.commit()

@@ -1,24 +1,81 @@
-/* productos.css - Estilos específicos para productos */
-
-/* Reducir el ancho de la columna 'Acciones' */
-.table th:nth-child(6),
+/* productos.css */
+/* Ajuste para la columna de precio (columna 6) */
+.table th:nth-child(6), 
 .table td:nth-child(6) {
-    width: 20%;
-    text-align: center;
+    width: 10%;    /* Reducimos el ancho de la columna de precio */
+    text-align: right;  /* Alineamos el precio a la derecha */
 }
 
-/* Estilo para el formulario de producto */
+/* Ajuste para la columna de acciones */
+.table td:nth-child(9) {
+    width: 20%;
+    /* Quitamos el padding horizontal para tener más control */
+    padding: 8px 0;
+    /* Aseguramos que la celda no exceda su ancho asignado */
+    box-sizing: border-box;
+    /* Contenedor para los botones */
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    /* Restringimos el contenido al ancho de la celda */
+    min-width: 0;
+}
+
+/* Contenedor adicional para los botones */
+.table td:nth-child(9) > div {
+    /* Aseguramos que los botones se mantengan dentro de la celda */
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Ajustes específicos para los botones */
+.table td:nth-child(9) .btn {
+    /* Ajustamos el ancho para que quepa cómodamente */
+    width: 85%;
+    max-width: 90px;
+    /* Aseguramos que el botón no exceda su contenedor */
+    box-sizing: border-box;
+    /* Evitamos que el texto cause desbordamiento */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Manejo de responsividad */
+@media screen and (max-width: 768px) {
+    .table td:nth-child(9) {
+        flex-wrap: wrap;  /* Permite que los botones se envuelvan en pantallas pequeñas */
+        padding: 10px 15px;
+    }
+    
+    .table td:nth-child(9) .btn {
+        margin-bottom: 5px;  /* Espacio entre botones cuando se envuelven */
+    }
+}
+
+/* Mantenemos los estilos existentes para otras funcionalidades */
 #productForm .form-group {
     margin-bottom: 15px;
 }
 
-/* Estilo para el título del modal */
 .modal-title {
     margin: 0 auto;
 }
 
-/* Estilo para el buscador y filtros específicos de productos */
-#generoFilter,
+#generoFilter, 
 #priceFilter {
     margin-bottom: 10px;
+}
+
+.row-updated {
+    animation: highlightRow 2s ease-in-out;
+}
+
+@keyframes highlightRow {
+    0% { background-color: transparent; }
+    50% { background-color: rgba(255, 243, 205, 0.5); }
+    100% { background-color: transparent; }
 }

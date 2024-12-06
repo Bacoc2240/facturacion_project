@@ -1,13 +1,12 @@
-from sqlalchemy import Column, Integer, String, Float, ForeignKey, Boolean, DateTime
+from sqlalchemy import Column, Integer, String, Numeric, ForeignKey, Boolean, DateTime
 from sqlalchemy.orm import relationship
+import random
 from sqlalchemy.sql import func
-from src.models import session, Base
-from src.models.categorias import Categorias 
+from src.models import Base, session
+from src.models.categorias import Categorias
 from src.models.auditoria import Auditoria
+from sqlalchemy.exc import IntegrityError
 
-
-
-#Instancio el objeto productos mediante una clase
 class Productos(Base):
     __tablename__ = 'productos'
     
@@ -15,18 +14,16 @@ class Productos(Base):
     codigo_barras = Column(String(50), unique=True)
     nombre = Column(String(55))
     genero = Column(String(55))
-    descripcion = Column(String(300), unique=True, nullable=False)
-    stock = Column(Float(10, 8), nullable=False)
-    precio = Column(Float(10,8), nullable=False)
+    descripcion = Column(String(300), nullable=False)
+    stock = Column(Integer, nullable=False)
+    precio = Column(Numeric(10, 2), nullable=False)
     categoria_id = Column(Integer, ForeignKey('categorias.id'), nullable=False)
     activo = Column(Boolean, default=True)
     fecha_creacion = Column(DateTime(timezone=True), server_default=func.now())
     fecha_actualizacion = Column(DateTime(timezone=True), onupdate=func.now())
     
-    # Relaciones
     categoria = relationship('Categorias', backref='productos')
     
-    # Método Constructor, permite construir un elmento de esa clase
     def __init__(self, codigo_barras, nombre, genero, descripcion, stock, precio, categoria_id):
         self.codigo_barras = codigo_barras
         self.nombre = nombre
@@ -36,58 +33,90 @@ class Productos(Base):
         self.precio = precio
         self.categoria_id = categoria_id
         
-    # Método CRUD que para que gestionar la base de datos. 
-    @staticmethod
-    def obtener_productos():
-        return session.query(Productos).join(Categorias).filter(Productos.activo == True).all()
+    @classmethod
+    def obtener_productos(cls, session):
+        """
+        Obtiene todos los productos activos de la base de datos.
+        
+        Args:
+            session: Sesión de SQLAlchemy
+            
+        Returns:
+            List[Productos]: Lista de objetos Producto
+        """
+        try:
+            return session.query(cls).filter_by(activo=True).all()
+        except Exception as e:
+            print(f"Error al obtener productos: {str(e)}")
+            raise
     
     @staticmethod
-    def obtener_producto_por_codigo(codigo_barras):
+    def obtener_producto_por_codigo(session, codigo_barras):
         return session.query(Productos).filter_by(codigo_barras=codigo_barras).first()
     
     @staticmethod
-    def crear_producto(datos, usuario_id):
+    def generar_codigo_barras(session):
+        MAX_INTENTOS = 100
+        for _ in range(MAX_INTENTOS):
+            codigo = str(random.randint(1000000000, 9999999999))
+            if not session.query(Productos).filter_by(codigo_barras=codigo).first():
+                return codigo
+        raise ValueError("No se pudo generar un código de barras único después de múltiples intentos")
+
+    @staticmethod
+    def crear_producto(datos, usuario_id, session):
         try:
-            # Verificar si el producto ya existe
-            if Productos.obtener_producto_por_codigo(datos['codigo_barras']):
-                raise ValueError("El producto ya existe en la base de datos")
+            categorias_existentes = session.query(Categorias).count()
+            if categorias_existentes == 0:
+                raise ValueError("No hay categorías disponibles")
+            
+            codigo_barras = datos.get('codigo_barras') or Productos.generar_codigo_barras(session)
+            
+            if Productos.obtener_producto_por_codigo(session, codigo_barras):
+                raise ValueError("El producto ya existe")
+            
+            # Formatear el precio antes de guardar
+            precio = round(float(datos['precio']), 2)
             
             nuevo_producto = Productos(
-                codigo_barras=datos['codigo_barras'],
+                codigo_barras=codigo_barras,
                 nombre=datos['nombre'],
                 genero=datos['genero'],
                 descripcion=datos['descripcion'],
-                stock=datos['stock'],
-                precio=datos['precio'],
-                categoria_id=datos['categoria_id']
+                stock=int(datos['stock']) if datos.get('stock') else 0,
+                precio= precio,
+                categoria_id=int(datos['categoria_id'])
             )
             
+            # Primero agregamos y hacemos commit del producto
             session.add(nuevo_producto)
+            session.commit()
             
-            # Registrar auditoría
-            auditoria = Auditoria(
+            # Usamos el método de clase crear_auditoria
+            Auditoria.crear_auditoria(
                 tabla='productos',
                 accion='crear',
                 registro_id=nuevo_producto.id,
                 usuario_id=usuario_id,
-                detalles=f"Creación del producto: {nuevo_producto.nombre}"
+                detalles=f"Creación del producto: {datos['nombre']}"
             )
-            session.add(auditoria)
             
-            session.commit()
             return nuevo_producto
             
+        except IntegrityError:
+            session.rollback()
+            raise ValueError("Error de integridad en la base de datos")
         except Exception as e:
             session.rollback()
-            raise e
+            raise ValueError(f"Error al crear el producto: {str(e)}")
     
     def actualizar(self, datos, usuario_id):
         try:
             for key, value in datos.items():
-                if hasattr(self, key):
+                if hasattr(self, key) and key not in ['id', 'codigo_barras']:  # No permitimos actualizar id ni código de barras
                     setattr(self, key, value)
+                    
             
-            # Registrar auditoría
             auditoria = Auditoria(
                 tabla='productos',
                 accion='actualizar',
@@ -96,7 +125,6 @@ class Productos(Base):
                 detalles=f"Actualización del producto: {self.nombre}"
             )
             session.add(auditoria)
-            
             session.commit()
             return self
             
@@ -107,8 +135,6 @@ class Productos(Base):
     def suspender(self, usuario_id):
         try:
             self.activo = False
-            
-            # Registrar auditoría
             auditoria = Auditoria(
                 tabla='productos',
                 accion='suspender',
@@ -117,7 +143,6 @@ class Productos(Base):
                 detalles=f"Suspensión del producto: {self.nombre}"
             )
             session.add(auditoria)
-            
             session.commit()
             return self
             
@@ -128,8 +153,6 @@ class Productos(Base):
     def reactivar(self, usuario_id):
         try:
             self.activo = True
-            
-            # Registrar auditoría
             auditoria = Auditoria(
                 tabla='productos',
                 accion='reactivar',
@@ -138,7 +161,6 @@ class Productos(Base):
                 detalles=f"Reactivación del producto: {self.nombre}"
             )
             session.add(auditoria)
-            
             session.commit()
             return self
             

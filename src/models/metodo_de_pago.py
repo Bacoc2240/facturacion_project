@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Text
 from sqlalchemy.orm import relationship
-from src.models import session, Base
+from src.models import Base, session
 
 class MetodoDePago(Base):
     __tablename__ = 'metodo_de_pago'
@@ -10,7 +10,7 @@ class MetodoDePago(Base):
     descripcion = Column(Text)
 
     # Relación con la tabla intermedia 'factura_metodo_de_pago'
-    facturas = relationship('Factura', secondary='factura_metodo_de_pago', back_populates='metodos_pago')
+    factura = relationship('Factura', secondary='factura_metodo_de_pago', back_populates='metodos_pago')
 
     # Constructor
     def __init__(self, nombre_metodo, descripcion=None):

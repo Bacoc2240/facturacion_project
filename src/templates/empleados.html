@@ -15,23 +15,22 @@
             <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block sidebar">
                 <div class="sidebar-sticky">
                     <ul class="nav flex-column">
-                        <!-- Usamos url_for para generar las URLs de manera dinámica -->
-                        <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}">Inicio</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{{ url_for('productos') }}">Productos</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{{ url_for('clientes') }}">Clientes</a></li>
-                        <li class="nav-item"><a class="nav-link active" href="{{ url_for('empleados') }}">Empleados</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{{ url_for('facturas') }}">Facturas</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{{ url_for('transacciones') }}">Transacciones</a></li>
-                        <!-- Añadir rutas para Reportes y Configuración cuando estén implementadas -->
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard.index') }}">Inicio</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('productos.index') }}">Productos</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('clientes.index') }}">Clientes</a></li>
+                        <li class="nav-item"><a class="nav-link active" href="{{ url_for('empleados.index') }}">Empleados</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('facturas.index') }}">Facturas</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('transacciones.index') }}">Transacciones</a></li>
+                        <!-- Para las rutas que aún no están implementadas, podemos usar # temporalmente -->
                         <li class="nav-item"><a class="nav-link" href="#">Reportes</a></li>
                         <li class="nav-item"><a class="nav-link" href="#">Configuración</a></li>
-                        <li class="nav-item"><a id="logout" class="nav-link" href="{{ url_for('logout') }}">Cerrar sesión</a></li>
+                        <li class="nav-item"><a id="logout" class="nav-link" href="{{ url_for('auth.logout') }}">Cerrar sesión</a></li>
                     </ul>
                 </div>
             </nav>
 
             <!-- Contenido principal -->
-            <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
+            <div role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
                 <h1 class="h2">Listado de Empleados</h1>
                 <div class="row mb-3">
                     <!-- Buscador -->
@@ -41,77 +40,179 @@
                 </div>
 
                 <!-- Opciones de Gestión -->
-                <div class="row mb-3">
-                    <div class="col-md-12 text-right">
-                        <button class="btn btn-success" onclick="openEmployeeModal()">Añadir Empleado</button>
-                    </div>
-                </div>
-
-                <!-- Listado de Empleados -->
                 <div class="row">
-                    <div class="col-md-12">
-                        <table class="table table-bordered table-striped">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Nombre</th>
-                                    <th>Teléfono</th>
-                                    <th>Contacto</th>
-                                    <th>Puesto</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody id="employeeTable">
-                                <!-- Aquí se llenará dinámicamente con empleados -->
-                            </tbody>
-                        </table>
+                    <div class="col-md-12 text-right mb-3">
+                        <button class="btn btn-success" id="addEmployeeButton">Añadir Empleado</button>
                     </div>
                 </div>
-            </main>
-        </div>
-    </div>
+                <!-- Modal de Creación de Empleado -->
+                <div class="modal fade" id="employeeModal" tabindex="-1" role="dialog" aria-labelledby="employeeModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="employeeModalLabel">Crear Empleado</h5>
+                                <!-- Botón cerrar en Bootstrap 4 -->
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="employeeForm">
+                                    <div class="form-group">
+                                        <label for="nombre_apellidos">Nombre y Apellidos</label>
+                                        <input type="text" class="form-control" id="nombre_apellidos" name="nombre_apellidos" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="numero_identificacion">Número de Identificación</label>
+                                        <input type="text" class="form-control" id="numero_identificacion" name="numero_identificacion" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="correo_electronico">Correo Electrónico</label>
+                                        <input type="email" class="form-control" id="correo_electronico" name="correo_electronico" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="telefono">Teléfono</label>
+                                        <input type="tel" class="form-control" id="telefono" name="telefono" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="fecha_contratacion">Fecha de Contratación</label>
+                                        <input type="date" class="form-control" id="fecha_contratacion" name="fecha_contratacion" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="cargo">Cargo</label>
+                                        <select class="form-control" id="cargo" name="cargo" required>
+                                            <option value="">Selecciona un cargo</option>
+                                            <option value="Vendedor">Vendedor</option>
+                                            <option value="Inventario">Supervisor</option>
+                                            <option value="Visualizador">Visualizador</option>
+                                        </select>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                <button type="submit" form="employeeForm" class="btn btn-primary">Guardar Empleado</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-    <!-- Modal para Añadir/Editar Empleado -->
-    <div class="modal fade" id="employeeModal" tabindex="-1" aria-labelledby="employeeModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="employeeModalLabel">Añadir Empleado</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                <!-- Modal de Edición de Empleado -->
+                <div class="modal fade" id="editEmployeeModal" tabindex="-1" role="dialog" aria-labelledby="editEmployeeModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="editEmployeeModalLabel">Editar Empleado</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="editEmployeeForm">
+                                    <input type="hidden" id="edit_id_empleado" name="id_empleado">
+                                    
+                                    <!-- Campos del formulario de edición -->
+                                    <div class="form-group">
+                                        <label for="edit_nombre_apellidos">Nombre y Apellidos</label>
+                                        <input type="text" class="form-control" id="edit_nombre_apellidos" name="nombre_apellidos" required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="edit_numero_identificacion">Número de Identificación</label>
+                                        <input type="text" class="form-control" id="numero_identificacion" name="numero_identificacion" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="edit_correo_electronico">Correo Electrónico</label>
+                                        <input type="email" class="form-control" id="correo_electronico" name="correo_electronico" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="edit_telefono">Teléfono</label>
+                                        <input type="tel" class="form-control" id="telefono" name="telefono" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="edit_fecha_contratacion">Fecha de Contratación</label>
+                                        <input type="date" class="form-control" id="fecha_contratacion" name="fecha_contratacion" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="edit_cargo">Cargo</label>
+                                        <select class="form-control" id="cargo" name="cargo" required>
+                                            <option value="">Selecciona un cargo</option>
+                                            <option value="Vendedor">Vendedor</option>
+                                            <option value="Inventario">Supervisor</option>
+                                            <option value="Visualizador">Visualizador</option>
+                                        </select>
+                                    </div>                                    
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                <button type="submit" form="editEmployeeForm" class="btn btn-primary">Guardar Cambios</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="modal-body">
-                    <form id="employeeForm">
-                        <!-- Campo para el ID del empleado -->
-                        <div class="form-group">
-                            <label for="employeeId">ID</label>
-                            <input type="text" class="form-control" id="employeeId" required>
-                        </div>
-                        <!-- Campo para el nombre del empleado -->
-                        <div class="form-group">
-                            <label for="employeeName">Nombre</label>
-                            <input type="text" class="form-control" id="employeeName" required>
-                        </div>
-                        <!-- Campo para el teléfono del empleado -->
-                        <div class="form-group">
-                            <label for="employeePhone">Teléfono</label>
-                            <input type="tel" class="form-control" id="employeePhone" required>
-                        </div>
-                        <!-- Campo para el puesto del empleado -->
-                        <div class="form-group">
-                            <label for="employeePosition">Puesto</label>
-                            <input type="text" class="form-control" id="employeePosition" required>
-                        </div>
-                        <!-- Campo para el contacto del empleado -->
-                        <div class="form-group">
-                            <label for="employeeContact">Contacto</label>
-                            <input type="email" class="form-control" id="employeeContact" required>
-                        </div>
-                        <!-- Botón para guardar el empleado -->
-                        <button type="submit" class="btn btn-primary">Guardar</button>
-                    </form>
-                </div>
+                
+                <!-- Tabla de Empleados -->
+                <hr>
+                <h3 class="mt-4">Lista de Empleados</h3>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre y Apellidos</th>
+                            <th>Número de Identificación</th>
+                            <th>Correo Electrónico</th>
+                            <th>Teléfono</th>
+                            <th>Cargo</th>
+                            <th>Fecha de Contratación</th>
+                            <th>Activo</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for empleado in empleados %}
+                            <tr data-id="{{ empleado.id_empleado }}">
+                                <td>{{ empleado.id_empleado }}</td>
+                                <td>{{ empleado.nombre_apellidos }}</td>
+                                <td>{{ empleado.numero_identificacion }}</td>
+                                <td>{{ empleado.correo_electronico }}</td>
+                                <td>{{ empleado.telefono }}</td>
+                                <td>{{ empleado.cargo }}</td>
+                                <td>{{ empleado.fecha_contratacion.strftime('%d/%m/%Y') }}</td>
+                                <td>{{ 'Sí' if empleado.activo else 'No' }}</td>
+                                <td class="text-center">
+                                    <button 
+                                        data-id="{{ empleado.id_empleado }}" 
+                                        class="btn btn-warning btn-sm edit-btn">
+                                        Editar
+                                    </button>
+                                    {% if empleado.activo %}
+                                        <button 
+                                            data-id="{{ empleado.id_empleado }}" 
+                                            class="btn btn-danger btn-sm suspend-btn">
+                                            Suspender
+                                        </button>
+                                    {% else %}
+                                        <button 
+                                            data-id="{{ empleado.id_empleado }}" 
+                                            class="btn btn-success btn-sm reactivate-btn">
+                                            Reactivar
+                                        </button>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -123,7 +224,6 @@
 
     <script>
         function cerrarSesion() {
-            // Lógica para limpiar datos de sesión
             window.location.href = '/';
         }
     </script>

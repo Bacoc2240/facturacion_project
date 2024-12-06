@@ -15,17 +15,17 @@
             <div class="text-center mb-4">
                 <img src="{{ url_for('static', filename='images/logo.jpeg') }}" alt="Logo" class="img-fluid d-block mx-auto">
             </div>
-            <form action="{{ url_for('login') }}" method="post">
+            <form action="{{ url_for('auth.login') }}" method="post">
                 <div class="form-group">
-                    <input type="text" class="form-control" id="username" name="username" placeholder="Usuario" required>
+                    <input type="text" class="form-control" id="nombre_usuario" name="nombre_usuario" placeholder="Usuario" required>
                 </div>
                 <div class="form-group">
-                    <input type="password" class="form-control" id="password" name="password" placeholder="Contraseña" required>
+                    <input type="password" class="form-control" id="contraseña" name="contraseña" placeholder="Contraseña" required>
                 </div>
                 <button type="submit" class="btn btn-primary btn-block">Ingresar</button>
             </form>
             <div class="text-center mt-3">
-                <a href="{{ url_for('forgot_password') }}" class="text-primary" style="text-decoration: underline;">¿Olvidaste tu contraseña?</a>
+                <a href="{{ url_for('auth.forgot_password') }}" class="text-primary" style="text-decoration: underline;">¿Olvidaste tu contraseña?</a>
             </div>
         </div>
     </div>

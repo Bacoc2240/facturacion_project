@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Date, Boolean
-from src.models import session, Base
+from src.models import Base, session
 from datetime import datetime
 
 class ResolucionDIAN(Base):
@@ -22,7 +22,7 @@ class ResolucionDIAN(Base):
         self.fecha_final = fecha_final
         self.numero_actual = rango_inicial
 
-    # Nuemración facturas
+    # Numeración facturas
     def asignar_numero_factura(self):
         if self.numero_actual > self.rango_final:
             raise ValueError("El rango de facturación ha sido agotado.")
@@ -38,3 +38,8 @@ class ResolucionDIAN(Base):
     def es_resolucion_valida(self):
         hoy = datetime.now().date()
         return self.fecha_inicial <= hoy <= self.fecha_final
+
+    # Guardar cambios en la base de datos
+    def guardar(self):
+        session.add(self)
+        session.commit()

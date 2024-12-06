@@ -1,3 +1,7 @@
+import sys 
+import os 
+# Añadir la ruta raíz del proyecto a sys.path 
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from alembic import op
 import sqlalchemy as sa
 from sqlalchemy import create_engine, text
@@ -37,13 +41,14 @@ def crear_empleados_iniciales():
 
     empleados = []
     for data in empleados_data:
-        empleado = session.query(Empleado).filter_by(documento=data['documento']).first()
+        empleado = session.query(Empleado).filter_by(numero_identificacion=data['documento']).first()
         if not empleado:
             empleado = Empleado(
                 nombre=data['nombre'],
-                documento=data['documento'],
+                numero_identificacion=data['documento'],
                 cargo=data['cargo'],
-                email=data['email']
+                correo_electronico=data['correo_electronico'],
+                is_test_data=True
             )
             session.add(empleado)
             session.flush()  # Para obtener el id generado
@@ -91,7 +96,8 @@ def crear_usuarios_iniciales(empleados):
                 nombre_usuario=data['nombre_usuario'],
                 contraseña=data['contraseña'],
                 rol=data['rol'],
-                id_empleado=data['empleado'].id_empleado
+                id_empleado=data['empleado'].id_empleado,
+                is_test_data=True
             )
             session.add(usuario)
 

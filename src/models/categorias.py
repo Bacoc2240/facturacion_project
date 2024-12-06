@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Float, ForeignKey
-from src.models import session, Base
+from src.models import Base, session  # Usar la sesión global
 
 class Categorias(Base):
     __tablename__ = "categorias"    
@@ -8,3 +8,7 @@ class Categorias(Base):
 
     def __init__(self, categoria):
         self.categoria = categoria
+        
+    @staticmethod
+    def obtener_categorias():
+        return session.query(Categorias).all()  # Usando la sesión global

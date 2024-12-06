@@ -14,16 +14,16 @@
             <div class="sidebar-sticky">
                 <ul class="nav flex-column">
                     <!-- Usamos url_for para generar las URLs de manera dinámica -->
-                    <li class="nav-item"><a class="nav-link active" href="{{ url_for('dashboard') }}">Inicio</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('productos') }}">Productos</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('clientes') }}">Clientes</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('empleados') }}">Empleados</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('facturas') }}">Facturas</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('transacciones') }}">Transacciones</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="{{ url_for('dashboard.index') }}">Inicio</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('productos.index') }}">Productos</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('clientes.index') }}">Clientes</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('empleados.index') }}">Empleados</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('facturas.index') }}">Facturas</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('transacciones.index') }}">Transacciones</a></li>
                     <!-- Añadir rutas para Reportes y Configuración cuando estén implementadas -->
                     <li class="nav-item"><a class="nav-link" href="#">Reportes</a></li>
                     <li class="nav-item"><a class="nav-link" href="#">Configuración</a></li>
-                    <li class="nav-item"><a id="logout" class="nav-link" href="{{ url_for('logout') }}">Cerrar sesión</a></li>
+                    <li class="nav-item"><a id="logout" class="nav-link" href="{{ url_for('auth.logout') }}">Cerrar sesión</a></li>
                 </ul>
             </div>
         </nav>

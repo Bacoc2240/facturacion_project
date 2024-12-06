@@ -1,12 +1,8 @@
 from sqlalchemy import Column, Integer, Float, ForeignKey, Date, Table, String
 from sqlalchemy.orm import relationship
-from src.models import session, Base
-from src.models.cliente import Cliente
-from src.models.empleado import Empleado
-from src.models.promocion import Promocion
+from src.models import Base, session
 from src.models.metodo_de_pago import MetodoDePago
 from src.models.resolucion_dian import ResolucionDIAN
-
 
 # Tabla intermedia para la relación Many-to-Many entre Factura y MetodoDePago
 factura_metodo_de_pago = Table(
@@ -16,10 +12,8 @@ factura_metodo_de_pago = Table(
     extend_existing=True  # Este parámetro evitará el error de redefinición
 )
 
-
 class Factura(Base):
     __tablename__ = 'factura'
-
     id = Column(Integer, primary_key=True)
     numero_factura = Column(Integer, nullable=False, unique=True)
     fecha = Column(Date, nullable=False)
@@ -39,7 +33,7 @@ class Factura(Base):
     transacciones = relationship('Transaccion', back_populates='factura')
 
     # Relación Many-to-Many con MetodoDePago
-    metodos_pago = relationship('MetodoDePago', secondary=factura_metodo_de_pago, back_populates='facturas')
+    metodos_pago = relationship('MetodoDePago', secondary=factura_metodo_de_pago, back_populates='factura')
 
     def __init__(self, fecha, subtotal, IVA, id_cliente, id_empleado, id_resolucion, descuento_aplicado=None, id_promocion=None, metodos_pago_ids=[]):
         self.fecha = fecha
@@ -63,14 +57,12 @@ class Factura(Base):
         # Agregar los métodos de pago seleccionados
         self.agregar_metodos_pago(metodos_pago_ids)
 
-    # Método para calcular el total con IVA y descuento (si aplica)
     def calcular_total(self):
         total_con_iva = self.subtotal + (self.subtotal * (self.IVA / 100))
         if self.descuento_aplicado:
             total_con_iva -= self.descuento_aplicado
         return total_con_iva
 
-    # Método para aplicar el descuento de una promoción a la factura
     def aplicar_descuento(self, promocion):
         if promocion and promocion.esta_activa():
             self.descuento_aplicado = promocion.aplicar_descuento(self.subtotal)
@@ -78,7 +70,6 @@ class Factura(Base):
             raise ValueError("La promoción no es válida o ha expirado.")
         self.total = self.calcular_total()
 
-    # Método para agregar múltiples métodos de pago a la factura
     def agregar_metodos_pago(self, metodos_pago_ids):
         for metodo_id in metodos_pago_ids:
             metodo = session.query(MetodoDePago).get(metodo_id)
@@ -86,6 +77,5 @@ class Factura(Base):
                 self.metodos_pago.append(metodo)
         session.commit()
 
-    # Método para obtener todos los métodos de pago seleccionados
     def obtener_metodos_pago(self):
         return [metodo.nombre_metodo for metodo in self.metodos_pago]

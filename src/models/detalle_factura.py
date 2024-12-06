@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Float, ForeignKey
-from src.models import session, Base
+from src.models import Base, session
 from src.models.productos import Productos
 from src.models.factura import Factura
 
@@ -13,7 +13,6 @@ class DetalleFactura(Base):
     id_factura = Column(Integer, ForeignKey('factura.id'), nullable=False)
     id_producto = Column(Integer, ForeignKey('productos.id'), nullable=False)
 
-     
     # Constructor del modelo
     def __init__(self, precio_unitario, cantidad, id_factura, id_producto):
         self.precio_unitario = precio_unitario
@@ -25,3 +24,8 @@ class DetalleFactura(Base):
     # Método para actualizar el subtotal
     def calcular_subtotal(self):
         self.subtotal = self.precio_unitario * self.cantidad
+
+    # Guardar en la base de datos usando la sesión global
+    def guardar(self):
+        session.add(self)
+        session.commit()

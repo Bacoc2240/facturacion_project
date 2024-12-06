@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Text
 from sqlalchemy.orm import relationship
-from src.models import session, Base
+from src.models import Base, session  # Usar la sesión global
 from sqlalchemy.orm import validates
 from sqlalchemy.exc import IntegrityError
 
@@ -63,7 +63,6 @@ class Cliente(Base):
             session.rollback()
             print("Error al intentar agregar el cliente. Posible problema de integridad en la base de datos.")
 
-
     # Método para agregar una compra al historial
     def agregar_compra(self, detalle_compra):
         if self.historial_compras:
@@ -81,6 +80,3 @@ class Cliente(Base):
             self.telefono = telefono
         if correo_electronico:
             self.correo_electronico = correo_electronico
-
-
-    

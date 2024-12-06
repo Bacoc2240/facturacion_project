@@ -1,166 +1,207 @@
-// Datos iniciales de clientes (puedes sustituir esto por una fuente de datos real)
-let employees = [
-    {
-        id: 1111900765,
-        name: 'Leidy Castillo',
-        phone: '3113452244',
-        contact: 'leidy.castillo@example.com',
-        position: 'vendedor',
-    },
-    {
-        id: 68900321,
-        name: 'Julia Parada',
-        phone: '3009687854',
-        contact: 'julia.parada@example.com',
-        position: 'vendedor',
-              
-    },
-    {
-        id: 60441678,
-        name: 'Johana Sanchez',
-        phone: '3017724351',
-        contact: 'johana.sanchez@example.com',
-        position: 'administrador',
-        
-    }
+// Primero, añadimos la función debounce que faltaba
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
 
-];
-// Variables globales para el modo de edición y referencia al empleado a editar
+// Configuración y variables globales
+const ROUTES = {
+    crear: '/empleados/crear',
+    lista: '/empleados/api/lista',
+    editar: (id) => `/empleados/editar/${id}`,
+    suspender: (id) => `/empleados/suspender/${id}`,
+    reactivar: (id) => `/empleados/reactivar/${id}`
+};
+
 let editMode = false;
 let editEmployeeRef = null;
 
-
-// Referencias a elementos del DOM
-const employeeTable = document.getElementById('employeeTable');
-const employeeForm = document.getElementById('employeeForm');
-const searchInput = document.getElementById('search');
-
-// Función para abrir el modal de empleado
+// Añadimos la función openEmployeeModal que faltaba
 function openEmployeeModal() {
+    // Resetear el modo de edición
     editMode = false;
     editEmployeeRef = null;
-    employeeForm.reset(); // Limpiar el formulario
-    $('#employeeModal').modal('show'); // Mostrar el modal
+    
+    // Limpiar el formulario
+    const form = document.getElementById('employeeForm');
+    if (form) {
+        form.reset();
+    }
+    
+    // Cambiar el título del modal
+    const modalTitle = document.querySelector('#employeeModal .modal-title');
+    if (modalTitle) {
+        modalTitle.textContent = 'Crear Empleado';
+    }
+    
+    // Abrir el modal usando jQuery (Bootstrap 4.3.1)
+    $('#employeeModal').modal('show');
 }
 
-// Función para renderizar la tabla de empleados
-function renderEmployeeTable() {
-    employeeTable.innerHTML = '';
-    employees.forEach((employee, index) => {
-        const row = `
-            <tr>
-                <td>${employee.id}</td>
-                <td>${employee.name}</td>
-                <td>${employee.phone}</td>
-                <td>${employee.contact}</td>
-                <td>${employee.position}</td>
-                <td>
-                    <button class="btn btn-warning btn-sm" onclick="editEmployee(${index})">Editar</button>
-                    <button class="btn btn-danger btn-sm" onclick="deleteEmployee(${index})">Eliminar</button>
-                </td>
-            </tr>
-        `;
-        employeeTable.insertAdjacentHTML('beforeend', row);
-    });
+// Función principal de inicialización
+function initializeEmployees() {
+    // Cargar empleados iniciales
+    cargarEmpleados();
+    
+    // Inicializar manejadores de eventos
+    setupEventListeners();
 }
 
-// Función para agregar un nuevo empleado o editar uno existente
-employeeForm.addEventListener('submit', function(event) {
+// Configuración de event listeners
+function setupEventListeners() {
+    // Formulario de creación
+    const form = document.getElementById('employeeForm');
+    if (form) {
+        form.addEventListener('submit', handleSubmit);
+    }
+
+    // Búsqueda
+    const searchInput = document.getElementById('search');
+    if (searchInput) {
+        searchInput.addEventListener('input', debounce(function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            buscarEmpleados(searchTerm);
+        }, 300));
+    }
+
+    // Añadir manejador para el botón de añadir empleado
+    const addButton = document.querySelector('[onclick="openEmployeeModal()"]');
+    if (addButton) {
+        // Remover el onclick del HTML y añadirlo aquí
+        addButton.removeAttribute('onclick');
+        addButton.addEventListener('click', openEmployeeModal);
+    }
+}
+// Función para cargar empleados
+async function cargarEmpleados() {
+    try {
+        const response = await fetch(ROUTES.lista);
+        if (!response.ok) {
+            throw new Error(`Error HTTP: ${response.status}`);
+        }
+        const empleados = await response.json();
+        actualizarTablaEmpleados(empleados);
+    } catch (error) {
+        console.error('Error al cargar empleados:', error);
+        mostrarAlerta('Error al cargar la lista de empleados', 'danger');
+    }
+}
+
+// Función para actualizar la tabla de empleados
+function actualizarTablaEmpleados(empleados) {
+    const tabla = document.querySelector('#employeeTable');
+    if (!tabla) return;
+
+    tabla.innerHTML = empleados.map(empleado => `
+        <tr>
+            <td>${empleado.id_empleado}</td>
+            <td>${empleado.nombre_apellidos}</td>
+            <td>${empleado.numero_identificacion}</td>
+            <td>${empleado.correo_electronico}</td>
+            <td>${empleado.telefono}</td>
+            <td>${empleado.cargo}</td>
+            <td>${formatearFecha(empleado.fecha_contratacion)}</td>
+            <td>${empleado.activo ? 'Sí' : 'No'}</td>
+            <td>
+                <button class="btn btn-warning btn-sm" onclick="editarEmpleado(${empleado.id_empleado})">
+                    Editar
+                </button>
+                ${empleado.activo ? 
+                    `<button class="btn btn-danger btn-sm" onclick="suspenderEmpleado(${empleado.id_empleado})">
+                        Suspender
+                     </button>` :
+                    `<button class="btn btn-success btn-sm" onclick="reactivarEmpleado(${empleado.id_empleado})">
+                        Reactivar
+                     </button>`
+                }
+            </td>
+        </tr>
+    `).join('');
+}
+
+// Manejador del formulario de creación
+async function handleSubmit(event) {
     event.preventDefault();
-    const newEmployee = {
-        id: document.getElementById('employeeId').value,
-        name: document.getElementById('employeeName').value,
-        phone: document.getElementById('employeePhone').value,
-        contact: document.getElementById('employeeContact').value,
-        position: document.getElementById('employeePosition').value,
+    const formData = new FormData(event.target);
+
+    try {
+        const response = await fetch(ROUTES.crear, {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await response.json();
+        if (!data.success) {
+            throw new Error(data.error || 'Error al crear el empleado');
+        }
+
+        // Cerrar modal usando jQuery (Bootstrap 4)
+        $('#employeeModal').modal('hide');
         
-    };
-
-    if (editMode) {
-        employees[editEmployeeRef] = newEmployee;
-    } else {
-        employees.push(newEmployee);
-    }
-
-    $('#employeeModal').modal('hide'); // Ocultar el modal
-    renderEmployeeTable(); // Renderizar la tabla de empleados
-});
-
-// Función para editar un empleado existente
-function editEmployee(index) {
-    editMode = true;
-    editEmployeeRef = index;
-    const employee = employees[index];
-    document.getElementById('employeeId').value = employee.id;
-    document.getElementById('employeeName').value = employee.name;
-    document.getElementById('employeePhone').value = employee.phone;
-    document.getElementById('employeeContact').value = employee.contact;
-    document.getElementById('employeePosition').value = employee.position;
-    $('#employeeModal').modal('show'); // Mostrar el modal
-}
-
-// Función para eliminar un empleado 
-function deleteEmployee(index) {
-    if (confirm('¿Estás seguro de que deseas eliminar este empleado?')) {
-        employees.splice(index, 1);
-        renderEmployeeTable(); // Renderizar la tabla de empleados
+        // Limpiar formulario y recargar datos
+        event.target.reset();
+        await cargarEmpleados();
+        mostrarAlerta('Empleado creado exitosamente', 'success');
+    } catch (error) {
+        console.error('Error:', error);
+        mostrarAlerta(error.message, 'danger');
     }
 }
 
-// Función para filtrar empleados
-searchInput.addEventListener('input', function() {
-    const searchTerm = this.value.toLowerCase();
-    const filteredEmployees = employees.filter(employee => 
-        employee.name.toLowerCase().includes(searchTerm) || 
-        employee.id.toString().toLowerCase().includes(searchTerm) ||
-        employee.phone.toLowerCase().includes(searchTerm) ||
-        employee.contact.toLowerCase().includes(searchTerm) ||
-        employee.position.toLowerCase().includes(searchTerm)
-    );
-    renderEmployeeTable(filteredEmployees);
-});
+// Función para mostrar alertas (Bootstrap 4)
+function mostrarAlerta(mensaje, tipo) {
+    const alertaHTML = `
+        <div class="alert alert-${tipo} alert-dismissible fade show" role="alert">
+            ${mensaje}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    `;
+    
+    const contenedor = document.querySelector('.container-fluid');
+    if (contenedor) {
+        contenedor.insertAdjacentHTML('afterbegin', alertaHTML);
+        // Auto-cerrar después de 5 segundos
+        setTimeout(() => {
+            $('.alert').alert('close');
+        }, 5000);
+    }
+}
 
+// Configuración de event listeners
+function setupEventListeners() {
+    // Formulario de creación
+    const form = document.getElementById('employeeForm');
+    if (form) {
+        form.addEventListener('submit', handleSubmit);
+    }
 
-// Función para renderizar la tabla de empleados
-function renderEmployeeTable(employeesToRender = employees) {
-    employeeTable.innerHTML = '';
-    employeesToRender.forEach((employee, index) => {
-        const row = `
-            <tr>
-                <td>${employee.id}</td>
-                <td>${employee.name}</td>
-                <td>${employee.phone}</td>
-                <td>${employee.contact}</td>
-                <td>${employee.position}</td>
-                <td>
-                    <button class="btn btn-warning btn-sm" onclick="editEmployee(${index})">Editar</button>
-                    <button class="btn btn-danger btn-sm" onclick="deleteEmployee(${index})">Eliminar</button>
-                </td>
-            </tr>
-        `;
-        employeeTable.insertAdjacentHTML('beforeend', row);
+    // Búsqueda
+    const searchInput = document.getElementById('search');
+    if (searchInput) {
+        searchInput.addEventListener('input', debounce(function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            buscarEmpleados(searchTerm);
+        }, 300));
+    }
+}
+
+// Función de ayuda para formatear fechas
+function formatearFecha(fecha) {
+    return new Date(fecha).toLocaleDateString('es-ES', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
     });
 }
 
-
-// Renderizar la tabla de empleados al cargar la página
-document.addEventListener('DOMContentLoaded', function() {
-    renderEmployeeTable();
-});
-
-// Función para cerrar sesión
-function cerrarSesion() {
-    // añadir lógica para cerrar sesión
-    // como limpiar datos de sesión, cookies, etc.
-
-    // Redirigir al usuario a la página de login
-    window.location.href = '/';
-}
-
-// Event listener para el enlace de cerrar sesión
-$(document).ready(function() {
-    $('#logout').on('click', function(e) {
-        e.preventDefault(); // Prevenir el comportamiento predeterminado del enlace
-        cerrarSesion();
-    });
-});
+// Inicializar cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', initializeEmployees);
