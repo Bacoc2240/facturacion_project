@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}PerfumEasy{% endblock %}</title>
     
-    <!-- Cargamos Bootstrap CSS desde un CDN -->
+    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     
     <!-- Estilos comunes -->
@@ -15,7 +15,7 @@
     {% block page_css %}{% endblock %}
 </head>
 <body>
-        
+    
     <main class="container-fluid mt-4">
         {% block content %}
         {% endblock %}
@@ -25,17 +25,13 @@
         <!-- Pie de página, opcional -->
     </footer>
     
-    <!-- Cargamos jQuery desde un CDN -->
+    <!-- Scripts necesarios en orden correcto -->
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-    
-    <!-- Cargamos Bootstrap JS desde un CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
     
-    <!-- Cargamos Chart.js desde un CDN -->
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
-    <!-- Scripts comunes 
-    <script src="{{ url_for('static', filename='js/common.js') }}"></script> -->
     
     <!-- Scripts específicos de la página -->
     {% block page_js %}{% endblock %}

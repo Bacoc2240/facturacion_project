@@ -32,19 +32,24 @@
             <!-- Contenido principal -->
             <div role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
                 <h1 class="h2">Listado de Empleados</h1>
+                
                 <div class="row mb-3">
-                    <!-- Buscador -->
                     <div class="col-md-4">
                         <input type="text" id="search" class="form-control" placeholder="Buscar empleados...">
                     </div>
-                </div>
-
-                <!-- Opciones de Gestión -->
-                <div class="row">
-                    <div class="col-md-12 text-right mb-3">
-                        <button class="btn btn-success" id="addEmployeeButton">Añadir Empleado</button>
+                    <div class="col-md-8 text-right">
+                        <button id="btnEmpleadosActivos" class="btn btn-primary">
+                            Empleados Activos
+                        </button>
+                        <button id="btnEmpleadosSuspendidos" class="btn btn-secondary">
+                            Empleados Suspendidos
+                        </button>
+                        <button type="button" class="btn btn-success" data-action="open-modal">
+                            Añadir Empleado
+                        </button>
                     </div>
                 </div>
+
                 <!-- Modal de Creación de Empleado -->
                 <div class="modal fade" id="employeeModal" tabindex="-1" role="dialog" aria-labelledby="employeeModalLabel" aria-hidden="true">
                     <div class="modal-dialog" role="document">

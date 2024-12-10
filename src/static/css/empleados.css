@@ -28,4 +28,53 @@
     border-top: 1px solid #dee2e6;
 }
 
+/* Ajuste para la columna de acciones */
+.table td:nth-child(9) {
+    width: 20%;
+    /* Quitamos el padding horizontal para tener más control */
+    padding: 8px 0;
+    /* Aseguramos que la celda no exceda su ancho asignado */
+    box-sizing: border-box;
+    /* Contenedor para los botones */
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    /* Restringimos el contenido al ancho de la celda */
+    min-width: 0;
+}
+
+/* Contenedor adicional para los botones */
+.table td:nth-child(9) > div {
+    /* Aseguramos que los botones se mantengan dentro de la celda */
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Ajustes específicos para los botones */
+.table td:nth-child(9) .btn {
+    /* Ajustamos el ancho para que quepa cómodamente */
+    width: 85%;
+    max-width: 90px;
+    /* Aseguramos que el botón no exceda su contenedor */
+    box-sizing: border-box;
+    /* Evitamos que el texto cause desbordamiento */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+/* Manejo de responsividad */
+@media screen and (max-width: 768px) {
+    .table td:nth-child(9) {
+        flex-wrap: wrap;  /* Permite que los botones se envuelvan en pantallas pequeñas */
+        padding: 10px 15px;
+    }
+    
+    .table td:nth-child(9) .btn {
+        margin-bottom: 5px;  /* Espacio entre botones cuando se envuelven */
+    }
+}
+
 
