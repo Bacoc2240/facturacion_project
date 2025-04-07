@@ -30,8 +30,10 @@
                     </ul>
                 </div>
             </nav>
-            <div class="col-md-10">
-                <h2 class="mb-4">Gestión de Productos</h2>
+
+            <!-- Contenido principal -->
+            <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
+                <h1 class="h2">Gestión de Productos</h1>
             
                 {% with messages = get_flashed_messages(with_categories=true) %} 
                     {% if messages %} 
@@ -41,190 +43,204 @@
                     {% endif %}
                 {% endwith %}
             
-                <div class="d-flex justify-content-between mb-3">
-                    <form id="filtroProductosForm" method="get" action="{{ url_for('productos.index') }}" class="form-inline">
-                        <div class="input-group">
-                            <input type="text" name="nombre" class="form-control" placeholder="Nombre" aria-label="Nombre">
-                            <select name="genero" class="form-control" aria-label="Género">
-                                <option value="">Género</option>
-                                <option value="Hombre">Hombre</option>
-                                <option value="Mujer">Mujer</option>
-                                <option value="Unisex">Unisex</option>
-                            </select>
-                            <select name="categoria" class="form-control" aria-label="Categoría">
-                                <option value="">Categoría</option>
+                <div class="row mb-3">
+                    <!-- Buscador y Filtros -->
+                    <div class="col-md-8">
+                        <form id="filtroProductosForm" method="get" action="{{ url_for('productos.index') }}" class="form-inline">
+                            <div class="input-group">
+                                <input type="text" name="nombre" class="form-control" placeholder="Nombre" aria-label="Nombre">
+                                <select name="genero" class="form-control" aria-label="Género">
+                                    <option value="">Género</option>
+                                    <option value="Hombre">Hombre</option>
+                                    <option value="Mujer">Mujer</option>
+                                    <option value="Unisex">Unisex</option>
+                                </select>
+                                <select name="categoria" class="form-control" aria-label="Categoría">
+                                    <option value="">Categoría</option>
+                                    <option value="Perfumes">Perfumes</option>
+                                    <option value="Ambientadores">Ambientadores</option>
+                                    <option value="Accesorios">Accesorios</option>
+                                </select>
+                                <select name="activo" class="form-control" aria-label="Activo">
+                                    <option value="">Activo</option>
+                                    <option value="1">Sí</option>
+                                    <option value="0">No</option>
+                                </select>
+                                <button type="submit" class="btn btn-secondary">Filtrar</button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <!-- Opciones de Gestión -->
+                    <div class="col-md-4 text-right">
+                        <button class="btn btn-success" onclick="openProductModal()">Crear Producto</button>
+                    </div>
+                </div>
+
+                <!-- Listado de Productos -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Código de Barras</th>
+                                        <th>Nombre</th>
+                                        <th>Género</th>
+                                        <th>Descripción</th>
+                                        <th>Stock</th>
+                                        <th>Precio</th>
+                                        <th>Categoría</th>
+                                        <th>Activo</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for producto in productos %}
+                                        <tr data-id="{{ producto.id }}">
+                                            <td>{{ producto.codigo_barras }}</td>
+                                            <td>{{ producto.nombre }}</td>
+                                            <td>{{ producto.genero }}</td>
+                                            <td>{{ producto.descripcion }}</td>
+                                            <td>{{ producto.stock }}</td>
+                                            <td>{{ "%.2f"|format(producto.precio|float) }}</td>
+                                            <td>{{ producto.categoria.categoria if producto.categoria else 'Sin categoría' }}</td>
+                                            <td>{{ 'Sí' if producto.activo else 'No' }}</td>
+                                            <td>
+                                                <div class="btn-action-container">
+                                                    <button 
+                                                        data-id="{{ producto.id }}" 
+                                                        class="btn btn-warning btn-sm edit-btn">
+                                                        Editar
+                                                    </button>
+                                                    {% if producto.activo %}
+                                                        <button 
+                                                            data-id="{{ producto.id }}" 
+                                                            class="btn btn-danger btn-sm suspend-btn">
+                                                            Suspender
+                                                        </button>
+                                                    {% else %}
+                                                        <button 
+                                                            data-id="{{ producto.id }}" 
+                                                            class="btn btn-success btn-sm reactivate-btn">
+                                                            Reactivar
+                                                        </button>
+                                                    {% endif %}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal para Añadir/Editar Producto -->
+    <div class="modal fade" id="productModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Crear Producto</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="productForm" action="{{ url_for('productos.crear_producto') }}" method="POST">
+                        <div class="form-group">
+                            <label for="nombre" class="form-label">Nombre</label>
+                            <input type="text" id="nombre" name="nombre" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="categoria" class="form-label">Categoría</label>
+                            <select id="categoria" name="categoria" class="form-control" required>
+                                <option value="">Selecciona una categoría</option>
                                 <option value="Perfumes">Perfumes</option>
                                 <option value="Ambientadores">Ambientadores</option>
                                 <option value="Accesorios">Accesorios</option>
                             </select>
-                            <select name="activo" class="form-control" aria-label="Activo">
-                                <option value="">Activo</option>
-                                <option value="1">Sí</option>
-                                <option value="0">No</option>
+                        </div>
+                        <div class="form-group">
+                            <label for="stock" class="form-label">Stock (<span id="unidadStock">-</span>)</label>
+                            <input type="number" id="stock" name="stock" class="form-control" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="genero" class="form-label">Género</label>
+                            <select id="genero" name="genero" class="form-control" required>
+                                <option value="">Selecciona un género</option>
+                                <option value="Hombre">Hombre</option>
+                                <option value="Mujer">Mujer</option>
+                                <option value="Unisex">Unisex</option>
                             </select>
-                            <button type="submit" class="btn btn-secondary">Filtrar</button>
                         </div>
+                        <div class="form-group">
+                            <label for="precio" class="form-label">Precio</label>
+                            <input type="number" id="precio" name="precio" class="form-control" min="0" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="descripcion" class="form-label">Descripción</label>
+                            <textarea id="descripcion" name="descripcion" class="form-control" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Guardar Producto</button>
                     </form>
-            
-                    <button class="btn btn-primary" onclick="openProductModal()">Crear Producto</button>
                 </div>
-            
-                <div class="modal fade" id="productModal" tabindex="-1" role="dialog">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Crear Producto</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                <form id="productForm" action="{{ url_for('productos.crear_producto') }}" method="POST">
-                                    <div class="mb-3">
-                                        <label for="nombre" class="form-label">Nombre</label>
-                                        <input type="text" id="nombre" name="nombre" class="form-control" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="categoria" class="form-label">Categoría</label>
-                                        <select id="categoria" name="categoria" class="form-control" required>
-                                            <option value="">Selecciona una categoría</option>
-                                            <option value="Perfumes">Perfumes</option>
-                                            <option value="Ambientadores">Ambientadores</option>
-                                            <option value="Accesorios">Accesorios</option>
-                                        </select>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="stock" class="form-label">Stock (<span id="unidadStock">-</span>)</label>
-                                        <input type="number" id="stock" name="stock" class="form-control" min="0" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="genero" class="form-label">Género</label>
-                                        <select id="genero" name="genero" class="form-control" required>
-                                            <option value="">Selecciona un género</option>
-                                            <option value="Hombre">Hombre</option>
-                                            <option value="Mujer">Mujer</option>
-                                            <option value="Unisex">Unisex</option>
-                                        </select>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="precio" class="form-label">Precio</label>
-                                        <input type="number" id="precio" name="precio" class="form-control" min="0" step="0.01" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="descripcion" class="form-label">Descripción</label>
-                                        <textarea id="descripcion" name="descripcion" class="form-control" required></textarea>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary">Guardar Producto</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            </div>
+        </div>
+    </div>
 
-                <!-- Modal de Edición -->
-                <div class="modal" id="editProductModal" tabindex="-1">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Editar Producto</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <form id="editProductForm" method="POST">
-                                    <input type="hidden" id="edit_id" name="id">
-                                    <div class="mb-3">
-                                        <label for="edit_nombre" class="form-label">Nombre</label>
-                                        <input type="text" id="edit_nombre" name="nombre" class="form-control" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="edit_categoria" class="form-label">Categoría</label>
-                                        <select id="edit_categoria" name="categoria" class="form-control" required>
-                                            <option value="">Selecciona una categoría</option>
-                                            <option value="Perfumes">Perfumes</option>
-                                            <option value="Ambientadores">Ambientadores</option>
-                                            <option value="Accesorios">Accesorios</option>
-                                        </select>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="edit_stock" class="form-label">Stock</label>
-                                        <input type="number" id="edit_stock" name="stock" class="form-control" min="0" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="edit_genero" class="form-label">Género</label>
-                                        <select id="edit_genero" name="genero" class="form-control" required>
-                                            <option value="">Selecciona un género</option>
-                                            <option value="Hombre">Hombre</option>
-                                            <option value="Mujer">Mujer</option>
-                                            <option value="Unisex">Unisex</option>
-                                        </select>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="edit_precio" class="form-label">Precio</label>
-                                        <input type="number" id="edit_precio" name="precio" class="form-control" min="0" step="0.01" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="edit_descripcion" class="form-label">Descripción</label>
-                                        <textarea id="edit_descripcion" name="descripcion" class="form-control" required></textarea>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
+    <!-- Modal de Edición -->
+    <div class="modal fade" id="editProductModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Editar Producto</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-            
-                <hr>
-                <h3 class="mt-4">Lista de Productos</h3>
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Código de Barras</th>
-                            <th>Nombre</th>
-                            <th>Género</th>
-                            <th>Descripción</th>
-                            <th>Stock</th>
-                            <th>Precio</th>
-                            <th>Categoría</th>
-                            <th>Activo</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for producto in productos %}
-                            <tr data-id="{{ producto.id }}">
-                                <td>{{ producto.codigo_barras }}</td>
-                                <td>{{ producto.nombre }}</td>
-                                <td>{{ producto.genero }}</td>
-                                <td>{{ producto.descripcion }}</td>
-                                <td>{{ producto.stock }}</td>
-                                <td>{{ "%.2f"|format(producto.precio|float) }}</td>
-                                <td>{{ producto.categoria.categoria if producto.categoria else 'Sin categoría' }}</td>
-                                <td>{{ 'Sí' if producto.activo else 'No' }}</td>
-                                <td class="text-center">
-                                    <button 
-                                        data-id="{{ producto.id }}" 
-                                        class="btn btn-warning btn-sm edit-btn">
-                                        Editar
-                                    </button>
-                                    {% if producto.activo %}
-                                        <button 
-                                            data-id="{{ producto.id }}" 
-                                            class="btn btn-danger btn-sm suspend-btn">
-                                            Suspender
-                                        </button>
-                                    {% else %}
-                                        <button 
-                                            data-id="{{ producto.id }}" 
-                                            class="btn btn-success btn-sm reactivate-btn">
-                                            Reactivar
-                                        </button>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                <div class="modal-body">
+                    <form id="editProductForm" method="POST">
+                        <input type="hidden" id="edit_id" name="id">
+                        <div class="form-group">
+                            <label for="edit_nombre" class="form-label">Nombre</label>
+                            <input type="text" id="edit_nombre" name="nombre" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_categoria" class="form-label">Categoría</label>
+                            <select id="edit_categoria" name="categoria" class="form-control" required>
+                                <option value="">Selecciona una categoría</option>
+                                <option value="Perfumes">Perfumes</option>
+                                <option value="Ambientadores">Ambientadores</option>
+                                <option value="Accesorios">Accesorios</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_stock" class="form-label">Stock</label>
+                            <input type="number" id="edit_stock" name="stock" class="form-control" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_genero" class="form-label">Género</label>
+                            <select id="edit_genero" name="genero" class="form-control" required>
+                                <option value="">Selecciona un género</option>
+                                <option value="Hombre">Hombre</option>
+                                <option value="Mujer">Mujer</option>
+                                <option value="Unisex">Unisex</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_precio" class="form-label">Precio</label>
+                            <input type="number" id="edit_precio" name="precio" class="form-control" min="0" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_descripcion" class="form-label">Descripción</label>
+                            <textarea id="edit_descripcion" name="descripcion" class="form-control" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>

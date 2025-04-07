@@ -1,0 +1,306 @@
+{% extends "layout.html" %}
+
+{% block title %}Gestión de Notas Crédito{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Gestión de Notas Crédito</h1>
+    
+    <div class="mb-3">
+        <a href="{{ url_for('facturas.index') }}" class="btn btn-secondary">
+            <i class="fa fa-arrow-left"></i> Volver a Facturas
+        </a>
+        <a href="#" class="btn btn-primary" onclick="crearNuevaNotaCredito()">
+            <i class="fa fa-plus"></i> Nueva Nota Crédito
+        </a>
+    </div>
+    
+    {% if error %}
+    <div class="alert alert-danger">
+        {{ error }}
+    </div>
+    {% endif %}
+    
+    <div class="card">
+        <div class="card-header">
+            <h3>Listado de Notas Crédito</h3>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Número</th>
+                            <th>Fecha</th>
+                            <th>Factura</th>
+                            <th>Motivo</th>
+                            <th>Total</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if notas_credito %}
+                            {% for nota in notas_credito %}
+                            <tr>
+                                <td>{{ nota.numero }}</td>
+                                <td>{{ nota.fecha_emision.strftime('%d/%m/%Y') if nota.fecha_emision else 'N/A' }}</td>
+                                <td>
+                                    {% if nota.factura %}
+                                        <a href="{{ url_for('facturas.ver_factura', factura_id=nota.factura.id) }}">
+                                            {{ nota.factura.numero_factura }}
+                                        </a>
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </td>
+                                <td>{{ nota.motivo_descripcion }}</td>
+                                <td>{{ '{:,.2f}'.format(nota.total) }}</td>
+                                <td>
+                                    <span class="badge {{ 'badge-success' if nota.estado == 'Procesada' else 'badge-warning' }}">
+                                        {{ nota.estado }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-sm btn-info" onclick="verNotaCreditoModal('{{ nota.id }}')">
+                                            <i class="fa fa-eye"></i> Ver
+                                        </button>
+                                        <a href="{{ url_for('notacredito.ver_nota_credito', nota_id=nota.id, print='true') }}" class="btn btn-sm btn-secondary" target="_blank">
+                                            <i class="fa fa-print"></i> Imprimir
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="7" class="text-center">No hay notas crédito registradas</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_js %}
+<script src="{{ url_for('static', filename='js/nota_credito.js') }}"></script>
+<script>
+    function verNotaCreditoModal(notaId) {
+        // Mostrar indicador de carga
+        Swal.fire({
+            title: 'Cargando nota crédito',
+            text: 'Por favor espere...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+        
+        // Lista de posibles rutas a probar
+        const rutas = [
+            `/notacredito/${notaId}`,
+            `/notacredito/api/${notaId}`,
+            `/api/notas-credito/${notaId}`
+        ];
+        
+        // Intentar cargar desde la primera ruta
+        intentarCargarDesdeRutas(rutas, 0, function(data) {
+            if (data) {
+                Swal.close();
+                mostrarModalDetalle(data, 'crédito', notaId);
+            } else {
+                // Si todas las rutas fallan, ir directamente a la impresión
+                Swal.fire({
+                    title: 'Error',
+                    text: 'No se pudo cargar la información de la nota crédito',
+                    icon: 'error',
+                    confirmButtonText: 'Cerrar'
+                });
+            }
+        });
+    }
+    
+    // Esta función debería estar definida en notas_asociadas.js, pero la incluimos aquí por si acaso
+    function intentarCargarDesdeRutas(rutas, indice, callback) {
+        // Si ya no hay más rutas que probar
+        if (indice >= rutas.length) {
+            console.warn('No se pudo cargar información de ninguna ruta');
+            callback(null);
+            return;
+        }
+        
+        const ruta = rutas[indice];
+        console.log('Intentando cargar desde:', ruta);
+        
+        fetch(ruta)
+            .then(function(response) {
+                if (!response.ok) {
+                    throw new Error('HTTP Error ' + response.status);
+                }
+                return response.json();
+            })
+            .then(function(data) {
+                callback(data);
+            })
+            .catch(function(error) {
+                console.warn('Error con ruta ' + ruta + ':', error.message);
+                // Intentar con la siguiente ruta
+                intentarCargarDesdeRutas(rutas, indice + 1, callback);
+            });
+    }
+    
+    // Esta función debería estar definida en notas_asociadas.js, pero la incluimos aquí por si acaso
+    function mostrarModalDetalle(data, tipo, notaId) {
+        // Obtener la nota del formato de respuesta
+        let nota = null;
+        if (data.nota_credito) {
+            nota = data.nota_credito;
+        } else if (data.success && data.nota_credito) {
+            nota = data.nota_credito;
+        } else {
+            nota = data;
+        }
+        
+        if (!nota) {
+            Swal.fire('Error', 'No se encontraron datos de la nota', 'error');
+            return;
+        }
+        
+        // Crear contenido HTML del modal
+        const numero = nota.numero || nota.id || 'N/A';
+        
+        // Determinar si tenemos información detallada
+        const tieneDetalles = nota.items || nota.detalles;
+        
+        // Contenido básico del modal
+        let modalContent = `
+            <div class="nota-detalle p-2">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <h5>Información General</h5>
+                        <p><strong>Número:</strong> ${numero}</p>
+                        <p><strong>Fecha:</strong> ${formatearFecha(nota.fecha_emision || nota.fecha || 'N/A')}</p>
+                        <p><strong>Factura asociada:</strong> ${nota.factura_numero || 
+                            (nota.factura && nota.factura.numero_factura) || 'N/A'}</p>
+                        <p><strong>Motivo:</strong> ${nota.motivo_descripcion || nota.motivo_dian || nota.concepto || nota.motivo || 'No especificado'}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>Totales</h5>
+                        <p><strong>Total:</strong> ${formatearMoneda(nota.total || 0)}</p>
+                        <p><strong>Estado:</strong> ${nota.estado || 'Procesada'}</p>
+                    </div>
+                </div>
+        `;
+        
+        // Agregar información de ítems si está disponible
+        if (tieneDetalles) {
+            const items = nota.items || nota.detalles || [];
+            modalContent += `
+                <h5 class="mt-3">Detalle de ítems</h5>
+                <div class="table-responsive">
+                    <table class="table table-striped table-sm">
+                        <thead>
+                            <tr>
+                                <th>Cantidad</th>
+                                <th>Precio Unitario</th>
+                                <th>IVA</th>
+                                <th>Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            items.forEach(item => {
+                const cantidad = item.cantidad || 0;
+                const precioUnitario = item.precio_unitario || 0;
+                const porcentajeIva = item.porcentaje_iva || 0;
+                const subtotal = item.subtotal || (cantidad * precioUnitario) || 0;
+                
+                modalContent += `
+                    <tr>
+                        <td>${cantidad}</td>
+                        <td>${formatearMoneda(precioUnitario)}</td>
+                        <td>${porcentajeIva}%</td>
+                        <td>${formatearMoneda(subtotal)}</td>
+                    </tr>
+                `;
+            });
+            
+            modalContent += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+        
+        // Agregar observaciones si existen
+        if (nota.observaciones) {
+            modalContent += `
+                <div class="mt-3">
+                    <h5>Observaciones</h5>
+                    <p>${nota.observaciones}</p>
+                </div>
+            `;
+        }
+        
+        // Botón para ver la nota completa
+        modalContent += `
+            <div class="mt-3 text-center">
+                <a href="/notacredito/ver/${notaId}?print=true" target="_blank" class="btn btn-primary">
+                    <i class="fas fa-print"></i> Ver Nota Completa
+                </a>
+            </div>
+        `;
+        
+        // Cerrar el div principal
+        modalContent += `</div>`;
+        
+        // Mostrar modal usando SweetAlert2
+        Swal.fire({
+            title: `Nota Crédito #${numero}`,
+            html: modalContent,
+            width: '800px',
+            confirmButtonText: 'Cerrar'
+        });
+    }
+    
+    // Función para formatear moneda
+    function formatearMoneda(valor) {
+        const monto = parseFloat(valor);
+        if (isNaN(monto)) return '$0';
+        
+        try {
+            return new Intl.NumberFormat('es-CO', {
+                style: 'currency',
+                currency: 'COP',
+                minimumFractionDigits: 2
+            }).format(monto);
+        } catch (e) {
+            console.error('Error al formatear moneda:', e);
+            return '$' + monto.toFixed(2);
+        }
+    }
+    
+    // Función para formatear fecha
+    function formatearFecha(fecha) {
+        if (!fecha) return 'N/A';
+        
+        try {
+            const date = new Date(fecha);
+            return date.toLocaleDateString('es-CO', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+        } catch (e) {
+            console.error('Error al formatear fecha:', e);
+            return fecha;
+        }
+    }
+</script>
+{% endblock %}
+

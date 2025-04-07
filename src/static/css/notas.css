@@ -1,0 +1,302 @@
+/* notas.css */
+
+
+/* Añadir a tu CSS */
+.swal-wide {
+    z-index: 1050;
+}
+
+.swal-wide-popup {
+    max-width: 95vw !important;
+}
+
+/* Para cuando el modal está dentro de un iframe */
+body.es-modal {
+    padding: 0 !important;
+    margin: 0 !important;
+    background: white !important;
+}
+
+body.es-modal .container-fluid {
+    padding: 0 !important;
+}
+
+body.es-modal .no-print {
+    display: none !important;
+}
+
+.notacredito-container {
+    font-family: Arial, sans-serif;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+}
+
+/* Estilos para el encabezado */
+.factura-header {
+    margin-bottom: 20px;
+}
+
+.factura-logo {
+    max-height: 180px;
+    max-width: 360px;
+}
+
+.empresa-info {
+    text-align: right;
+}
+
+.empresa-info h3 {
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.empresa-info p {
+    margin: 0;
+    line-height: 1.3;
+}
+
+/* Estilos para el título de la factura */
+.factura-titulo {
+    background-color: #f4f4f4;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+.factura-titulo h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.numero-factura {
+    background-color: #ddd;
+    padding: 5px 10px;
+    text-align: center;
+    border-radius: 3px;
+}
+
+.prefijo {
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+.numero {
+    font-weight: bold;
+}
+
+/* Estilos para la información del cliente */
+.factura-cliente {
+    margin-bottom: 20px;
+}
+
+.table-info {
+    width: 100%;
+}
+
+.table-info td {
+    padding: 3px 0;
+}
+
+.table-info .label {
+    font-weight: bold;
+    width: 40%;
+}
+
+/* Estilos para la tabla de productos */
+.factura-productos {
+    margin-bottom: 20px;
+}
+
+.table-productos {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table-productos th, 
+.table-productos td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.table-productos th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+}
+
+.text-right {
+    text-align: right;
+}
+
+/* Estilos para los totales */
+.factura-totales {
+    margin-bottom: 20px;
+}
+
+.valor-letras {
+    font-style: italic;
+    margin-bottom: 10px;
+}
+
+.factura-nota {
+    font-size: 0.85em;
+    color: #555;
+}
+
+.totales-box {
+    background-color: #f4f4f4;
+    padding: 10px;
+    border-radius: 3px;
+}
+
+.totales-box h4 {
+    margin-top: 0;
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.table-totales {
+    width: 100%;
+}
+
+.table-totales td {
+    padding: 3px 0;
+}
+
+.total-pagar {
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+/* Estilos para las firmas */
+.factura-firmas {
+    margin-top: 40px;
+}
+
+.firma-box {
+    padding: 10px;
+}
+
+.firma-linea {
+    border-top: 1px solid #000;
+    width: 80%;
+    margin: 20px auto 5px;
+}
+
+/* Estilos para el pie de página */
+.factura-footer {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.original {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.pagina {
+    font-size: 0.85em;
+    margin: 0;
+}
+
+/* Estilos específicos para impresión */
+@media print {
+    /* Ocultar elementos que no deben imprimirse */
+    .no-print, 
+    .btn-group, 
+    .modal,
+    footer,
+    header,
+    nav {
+        display: none !important;
+    }
+    
+    /* Asegurar que la factura ocupe toda la página */
+    body {
+        margin: 0;
+        padding: 0 !important;
+        background-color: #fff;
+    }
+    
+    .container-fluid {
+        width: 100%;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    
+    .factura-container {
+        border: none;
+        width: 100%;
+        max-width: 100%;
+        padding: 0;
+        margin: 0;
+        box-shadow: none;
+    }
+    
+    /* Evitar saltos de página dentro de elementos importantes */
+    .factura-header, 
+    .factura-titulo, 
+    .factura-cliente,
+    .table-productos tr {
+        page-break-inside: avoid;
+    }
+    
+    /* Forzar colores de fondo en impresión */
+    .factura-titulo, 
+    .table-productos th,
+    .totales-box {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        background-color: #f4f4f4 !important;
+    }
+    
+    /* Ajustar tamaño de fuente para impresión */
+    body {
+        font-size: 12pt;
+    }
+    
+    /* Asegurar que las imágenes se impriman bien */
+    img {
+        max-width: 100% !important;
+    }
+    
+    /* Mostrar URL de enlaces (opcional) */
+    a[href]:after {
+        content: none !important;
+    }
+    
+    /* Asegurar que las columnas de la factura se impriman correctamente */
+    .row {
+        display: flex !important;
+        flex-wrap: wrap !important;
+    }
+    
+    .col-6, .col-md-6 {
+        flex: 0 0 50% !important;
+        max-width: 50% !important;
+    }
+    
+    .col-7, .col-md-7 {
+        flex: 0 0 58.333333% !important;
+        max-width: 58.333333% !important;
+    }
+    
+    .col-5, .col-md-5 {
+        flex: 0 0 41.666667% !important;
+        max-width: 41.666667% !important;
+    }
+    
+    .col-8, .col-md-8 {
+        flex: 0 0 66.666667% !important;
+        max-width: 66.666667% !important;
+    }
+    
+    .col-4, .col-md-4 {
+        flex: 0 0 33.333333% !important;
+        max-width: 33.333333% !important;
+    }
+}

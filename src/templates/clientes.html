@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 
-{% block title %}Productos - PerfumEasy{% endblock %}
+{% block title %}Clientes - PerfumEasy{% endblock %}
 
 {% block page_css %}
     <!-- Archivo CSS específico para la página del dashboard -->
@@ -16,16 +16,16 @@
                 <div class="sidebar-sticky">
                     <ul class="nav flex-column">
                         <!-- Usamos url_for para generar las URLs de manera dinámica -->
-                        <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}">Inicio</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{{ url_for('productos') }}">Productos</a></li>
-                        <li class="nav-item"><a class="nav-link active" href="{{ url_for('clientes') }}">Clientes</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{{ url_for('empleados') }}">Empleados</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{{ url_for('facturas') }}">Facturas</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{{ url_for('transacciones') }}">Transacciones</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard.index') }}">Inicio</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('productos.index') }}">Productos</a></li>
+                        <li class="nav-item"><a class="nav-link active" href="{{ url_for('clientes.index') }}">Clientes</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('empleados.index') }}">Empleados</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('facturas.index') }}">Facturas</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('transacciones.index') }}">Transacciones</a></li>
                         <!-- Añadir rutas para Reportes y Configuración cuando estén implementadas -->
                         <li class="nav-item"><a class="nav-link" href="#">Reportes</a></li>
                         <li class="nav-item"><a class="nav-link" href="#">Configuración</a></li>
-                        <li class="nav-item"><a id="logout" class="nav-link" href="{{ url_for('logout') }}">Cerrar sesión</a></li>
+                        <li class="nav-item"><a id="logout" class="nav-link" href="{{ url_for('auth.logout') }}">Cerrar sesión</a></li>
                     </ul>
                 </div>
             </nav>
@@ -51,22 +51,24 @@
                 <!-- Listado de Clientes -->
                 <div class="row">
                     <div class="col-md-12">
-                        <table class="table table-clientes table-bordered table-striped">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Nombre</th>
-                                    <th>Número de Teléfono</th>
-                                    <th>Contacto</th>
-                                    <th>Historial de Compras</th>
-                                    <th>Preferencias</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody id="clientTable">
-                                <!-- Aquí se llenará dinámicamente con clientes -->
-                            </tbody>
-                        </table>
+                        <div class="table-responsive">
+                            <table class="table table-clientes table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Nombre</th>
+                                        <th>Número de Teléfono</th>
+                                        <th>Contacto</th>
+                                        <th>Historial de Compras</th>
+                                        <th>Preferencias</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="clientTable">
+                                    <!-- Aquí se llenará dinámicamente con clientes -->
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </main>
@@ -85,11 +87,25 @@
                 </div>
                 <div class="modal-body">
                     <form id="clientForm">
-                        <!-- Campo para el número de cedula del cliente -->
+                        <!-- Campo para el tipo de documento -->
                         <div class="form-group">
-                            <label for="clientCedula">Cédula</label>
+                            <label for="clientTipoDoc">Tipo de Documento</label>
+                            <select class="form-control" id="clientTipoDoc" required>
+                                <option value="">Seleccione un tipo de documento</option>
+                                <option value="CC">Cédula de Ciudadanía (CC)</option>
+                                <option value="TI">Tarjeta de Identidad (TI)</option>
+                                <option value="CE">Cédula de Extranjería (CE)</option>
+                                <option value="PP">Pasaporte (PP)</option>
+                                <option value="PEP">Permiso Especial de Permanencia (PEP)</option>
+                            </select>
+                        </div>
+
+                        <!-- Campo para el número de documento -->
+                        <div class="form-group">
+                            <label for="clientCedula">Número de Documento</label>
                             <input type="text" class="form-control" id="clientCedula" required>
                         </div>
+                        
                         <!-- Campo para el nombre del cliente -->
                         <div class="form-group">
                             <label for="clientName">Nombre</label>
@@ -101,18 +117,21 @@
                         </div>
                         <!-- Campo para el contacto del cliente -->
                         <div class="form-group">
-                            <label for="clientContact">Contacto</label>
+                            <label for="clientContact">Correo Electrónico</label>
                             <input type="text" class="form-control" id="clientContact" required>
                         </div>
                         <!-- Campo para historial de compras -->
                         <div class="form-group">
                             <label for="clientHistory">Historial de Compras</label>
-                            <textarea class="form-control" id="clientHistory" rows="3" required></textarea>
+                            <textarea class="form-control" id="clientHistory" rows="3" readonly
+                                      placeholder="El historial se actualizará automáticamente con las compras realizadas"></textarea>
                         </div>
+                        
                         <!-- Campo para las preferencias del cliente -->
                         <div class="form-group">
-                            <label for="clientPreferens">Preferencias</label>
-                            <textarea class="form-control" id="clientPreferens" rows="4" required></textarea>
+                            <label for="clientPreferens">Producto Más Comprado</label>
+                            <input type="text" class="form-control" id="clientPreferens" readonly
+                                   placeholder="Se calculará automáticamente según el historial"></input>
                         </div>
                         
                         <!-- Botón para guardar el cliente -->

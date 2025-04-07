@@ -13,6 +13,9 @@ from src.models.detalle_factura import DetalleFactura
 from src.models.metodo_de_pago import MetodoDePago
 from src.models.promocion import Promocion
 from src.models.resolucion_dian import ResolucionDIAN
+from src.models.nota_credito import NotaCredito, DetalleNotaCredito
+from src.models.nota_debito import NotaDebito, DetalleNotaDebito
+
 
 # Cargar variables de entorno
 load_dotenv()
@@ -38,7 +41,8 @@ app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_USERNAME')
 # Configuración de la URL base para desarrollo
 app.config['BASE_URL'] = os.getenv('BASE_URL', 'http://localhost:5000')
 
-
+# Configuración para archivos adjuntos
+app.config['UPLOAD_FOLDER'] = os.getenv('UPLOAD_FOLDER', 'static/uploads')
 
 # Inicializar Mail
 mail = Mail()
@@ -58,7 +62,7 @@ for rule in app.url_map.iter_rules():
 
 #print(app.url_map)
 
-# Tu procesador de contexto existente...
+#procesador de contexto
 @app.context_processor
 def utility_processor():
     def has_permission(permission):
@@ -82,5 +86,3 @@ if __name__ == '__main__':
         app.run(debug=True)
     except Exception as e:
         print(f"Error al iniciar la aplicación: {e}")
-
-

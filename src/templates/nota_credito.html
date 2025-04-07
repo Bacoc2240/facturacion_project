@@ -1,0 +1,310 @@
+{% extends "layout.html" %}
+
+{% block title %}Nota Crédito {{ nota_credito.numero }} - PERFUMERÍA ELLAS & ELLOS{% endblock %}
+
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/factura_print.css') }}">
+<style>
+    /* Estilos específicos para nota crédito */
+    .nota-credito-titulo h2 {
+        color: #d9534f; /* Color rojo para diferenciar de factura */
+    }
+    .numero-nc {
+        background-color: #f8d7da;
+        border: 1px solid #d9534f;
+        color: #721c24;
+        padding: 8px;
+        font-size: 18px;
+        font-weight: bold;
+        text-align: center;
+        border-radius: 4px;
+    }
+    .motivo-dian {
+        margin-top: 10px;
+        padding: 10px;
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+    }
+    .factura-original {
+        font-style: italic;
+        color: #6c757d;
+        margin-bottom: 15px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Botones de control (no se imprimirán) -->
+    <div class="row mb-3 no-print">
+        <div class="col-md-12">
+            <div class="d-flex justify-content-end">
+                <div class="btn-group">
+                    <button class="btn btn-primary mr-2" onclick="window.print()">
+                        <i class="fas fa-print"></i> Imprimir
+                    </button>
+                    <button class="btn btn-success mr-2" onclick="compartirNotaCredito()">
+                        <i class="fas fa-share-alt"></i> Compartir
+                    </button>
+                    <button class="btn btn-secondary" onclick="window.location.href='/notas-credito/'">
+                        <i class="fas fa-arrow-left"></i> Volver
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nota Crédito para impresión -->
+    <div class="factura-container" id="nota-credito-imprimir">
+        <!-- Encabezado de la nota crédito -->
+        <div class="factura-header">
+            <div class="row">
+                <div class="col-6 logo-container">
+                    <img src="{{ url_for('static', filename='images/Ellas_&_Ellos.jpeg') }}" alt="Logo" class="factura-logo">
+                </div>
+                <div class="col-6 empresa-info">
+                    <h3>PERFUMERÍA ELLAS & ELLOS</h3>
+                    <p>NIT: 800.100.200-1</p>
+                    <p>CC PLAZA REAL LOCAL 13</p>
+                    <p>PAMPLONA - NORTE DE SANTANDER</p>
+                    <p>ellasyellos@gmail.com</p>
+                    <p>6337150</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Título de la nota crédito -->
+        <div class="factura-titulo nota-credito-titulo">
+            <div class="row">
+                <div class="col-8">
+                    <h2>NOTA CRÉDITO DE LA FACTURA ELECTRÓNICA DE VENTA N°</h2>
+                    <p class="factura-original">{{ factura_original.prefijo }}{{ factura_original.numero_factura }}</p>
+                </div>
+                <div class="col-4">
+                    <div class="numero-factura numero-nc">
+                        <span class="prefijo">NC</span>
+                        <span class="numero">{{ nota_credito.numero }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Información del cliente -->
+        <div class="factura-cliente">
+            <div class="row">
+                <div class="col-md-6">
+                    <table class="table-info">
+                        <tr>
+                            <td class="label">Cliente:</td>
+                            <td>{{ cliente.nombre_cliente|default('No especificado') }}</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Nit:</td>
+                            <td>{{ cliente.id_cliente|default('N/A') }}</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Dirección:</td>
+                            <td>{{ cliente.direccion|default('N/A') }}</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Ciudad:</td>
+                            <td>{{ cliente.ciudad|default('PAMPLONA') }}</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Tel:</td>
+                            <td>{{ cliente.telefono|default('N/A') }}</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Correo:</td>
+                            <td>{{ cliente.correo_electronico|default('N/A') }}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <table class="table-info">
+                        <tr>
+                            <td class="label">Fecha Factura:</td>
+                            <td>{{ factura_original.fecha.strftime('%d/%m/%Y') if factura_original.fecha else 'N/A' }}</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Fecha Emisión NC:</td>
+                            <td>{{ nota_credito.fecha_emision.strftime('%d/%m/%Y') if nota_credito.fecha_emision else 'N/A' }}</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Forma de pago:</td>
+                            <td>{{ metodo_pago|default('CRÉDITO') }}</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Vendedor:</td>
+                            <td>{{ empleado.nombre|default('Vendedor no especificado') }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Motivo DIAN -->
+        <div class="motivo-dian">
+            <strong>Motivo DIAN:</strong> {{ nota_credito.motivo_descripcion }}
+        </div>
+
+        <!-- Tabla de productos -->
+        <div class="factura-productos">
+            <table class="table-productos">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Descripción</th>
+                        <th>Unid</th>
+                        <th>Cant</th>
+                        <th>V. Unit</th>
+                        <th>IVA</th>
+                        <th>Valor Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in detalles %}
+                    <tr>
+                        <td>{{ item.producto.get('codigo_barras', 'N/A') }}</td>
+                        <td>{{ item.producto.get('nombre', 'Producto no encontrado') }}</td>
+                        <td>
+                            {% set categoria = item.producto.get('categoria', '') %}
+                            {% if categoria == 'Perfumes' or categoria == 'Ambientadores' %}
+                                ml
+                            {% else %}
+                                UND
+                            {% endif %}
+                        </td>
+                        <td>{{ item.detalle.cantidad|default(0) }}</td>
+                        <td class="text-right">{{ '{:,.2f}'.format(item.detalle.precio_unitario|default(0)) }}</td>
+                        <td class="text-right">{{ item.porcentaje_iva|default(0) }}%</td>
+                        <td class="text-right">{{ '{:,.2f}'.format(item.detalle.subtotal|default(0)) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pie de nota crédito con totales -->
+        <div class="factura-totales">
+            <div class="row">
+                <div class="col-7">
+                    <div class="valor-letras">
+                        <p><strong>VALOR EN LETRAS:</strong> {{ valor_en_letras }} M/CTE</p>
+                    </div>
+                    <div class="factura-nota">
+                        {% if nota_credito.observaciones %}
+                        <div class="observaciones">
+                            <p><strong>Observaciones:</strong> {{ nota_credito.observaciones }}</p>
+                        </div>
+                        {% endif %}
+                        <p><strong>Autorización de facturación No.</strong> 00165 <strong>aprobado en</strong> 2025-03-14 <strong>prefijo NC desde el número</strong> 1 <strong>al</strong> 1000</p>
+                        <p>Régimen Común - Actividad Económica 4773</p>
+                        <p>No somos Agentes de Retención de IVA</p>
+                        <p>No somos Grandes Contribuyentes</p>
+                    </div>
+                </div>
+                <div class="col-5">
+                    <div class="totales-box">
+                        <h4>Totales</h4>
+                        <table class="table-totales">
+                            <tr>
+                                <td>Total Bruto</td>
+                                <td class="text-right">{{ '{:,.2f}'.format(nota_credito_valores.subtotal|default(0)) }}</td>
+                            </tr>
+                            {% if nota_credito_valores.IVA|default(0) > 0 %}
+                            <tr>
+                                <td>IVA</td>
+                                <td class="text-right">{{ '{:,.2f}'.format(nota_credito_valores.IVA|default(0)) }}</td>
+                            </tr>
+                            {% endif %}
+                            <tr class="total-pagar">
+                                <td>Total a Pagar</td>
+                                <td class="text-right">$ {{ '{:,.2f}'.format(nota_credito_valores.total|default(0)) }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Firmas -->
+        <div class="factura-firmas">
+            <div class="row">
+                <div class="col-6 text-center">
+                    <div class="firma-box">
+                        <div class="firma-linea"></div>
+                        <p>Elaborado por</p>
+                    </div>
+                </div>
+                <div class="col-6 text-center">
+                    <div class="firma-box">
+                        <div class="firma-linea"></div>
+                        <p>Firma Recibido</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pie de página -->
+        <div class="factura-footer">
+            <p class="original">ORIGINAL</p>
+            <p class="pagina">Página: 1 de 1</p>
+        </div>
+    </div>
+    <div id="nota-credito-data" data-nota-credito-id="{% if nota_credito and nota_credito.id %}{{ nota_credito.id }}{% else %}0{% endif %}"></div>
+</div>
+
+<!-- Modal para compartir por correo -->
+<div class="modal fade no-print" id="compartirModal" tabindex="-1" role="dialog" aria-labelledby="compartirModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="compartirModalLabel">Compartir Nota Crédito</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info">
+                    <strong>Importante:</strong> Para compartir esta nota crédito, puede guardarla como PDF desde la opción "Imprimir" y luego enviarla por correo.
+                </div>
+                <ol>
+                    <li>Haga clic en el botón "Imprimir"</li>
+                    <li>En el diálogo de impresión, seleccione "Guardar como PDF"</li>
+                    <li>Guarde el archivo y adjúntelo a su correo electrónico</li>
+                </ol>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="window.print()">Imprimir ahora</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_js %}
+
+<script src="{{ url_for('static', filename='js/nota_credito.js') }}"></script>
+
+<script>
+    // Recuperar el ID de la nota crédito desde el atributo de datos
+    const notaCreditoId = parseInt(document.getElementById('nota-credito-data').getAttribute('data-nota-credito-id')) || 0;
+    
+    // Función para mostrar el modal de compartir
+    function compartirNotaCredito() {
+        $('#compartirModal').modal('show');
+    }
+    
+    // Al cargar la página, comprobar si hay un parámetro para imprimir automáticamente
+    document.addEventListener('DOMContentLoaded', function() {
+        if (window.location.href.includes('print=true')) {
+            setTimeout(function() {
+                window.print();
+            }, 1000); // Esperar 1 segundo para asegurar que la página esté completamente cargada
+        }
+    });
+</script>
+{% endblock %}

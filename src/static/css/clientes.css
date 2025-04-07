@@ -1,29 +1,67 @@
 /* Archivo: clientes.css */
 
+/* Estilos generales para la tabla */
+.table-clientes {
+    width: 100%;
+    table-layout: fixed; /* Ayuda a controlar mejor el ancho de las columnas */
+    overflow-x: auto;
+}
+
 /* Ajustes de ancho para columnas específicas */
-.table-clientes th:nth-child(1),
-.table-clientes td:nth-child(1) {
-    width: 9%;
+.table-clientes th:nth-child(1), .table-clientes td:nth-child(1) {
+    width: 12%;
     text-align: center;
 }
 
-.table-clientes th:nth-child(2),
-.table-clientes td:nth-child(2) {
-    width: 14%;
+.table-clientes th:nth-child(2), .table-clientes td:nth-child(2) {
+    width: 15%;
+    text-align: left;
+}
+
+.table-clientes th:nth-child(3), .table-clientes td:nth-child(3) {
+    width: 12%;
     text-align: center;
 }
 
-.table-clientes th:nth-child(5),
-.table-clientes td:nth-child(5) {
-    width: 19%;
-    text-align: center;
-}
-
-.table-clientes th:nth-child(7),
-.table-clientes td:nth-child(7) {
+.table-clientes th:nth-child(4), .table-clientes td:nth-child(4) {
     width: 18%;
+    text-align: left;
+    word-break: break-word; /* Permite que el email se rompa si es muy largo */
+}
+
+.table-clientes th:nth-child(5), .table-clientes td:nth-child(5) {
+    width: 16%;
+    text-align: left;
+}
+
+.table-clientes th:nth-child(6), .table-clientes td:nth-child(6) {
+    width: 12%;
     text-align: center;
-    white-space: nowrap;
+}
+
+.table-clientes th:nth-child(7), .table-clientes td:nth-child(7) {
+    width: 15%;
+    text-align: center;
+}
+
+/* Hacer que la tabla sea responsiva */
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Estilos para los botones de acción */
+.btn-action-container {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    justify-content: center;
+}
+
+.btn-action-container .btn {
+    width: 100%;
+    padding: 5px 10px;
+    font-size: 0.9rem;
 }
 
 /* Estilo para el formulario dentro del modal */
@@ -35,4 +73,85 @@
 .modal-title {
     font-size: 20px;
     margin-bottom: 10px;
+}
+
+/* Estilo para las celdas de la tabla para evitar desbordamiento */
+.table-clientes td {
+    vertical-align: middle;
+    max-height: 80px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal; /* Permitir que el texto se envuelva */
+}
+
+/* Ajuste para mostrar mejor el historial y preferencias */
+.historial-cell, .preferencias-cell {
+    max-height: 60px;
+    overflow-y: auto;
+}
+
+/* Estilo específico para la celda de historial de compras */
+.historial-cell {
+    padding: 8px;
+    max-height: 150px;
+    overflow-y: auto;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    white-space: normal;
+    word-break: break-word;
+}
+
+/* Estilo para cada entrada de historial */
+.historial-entrada {
+    padding: 5px;
+    margin-bottom: 5px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+/* Estilo para la fecha y número de factura */
+.historial-factura {
+    font-weight: bold;
+    color: #555;
+    margin-bottom: 3px;
+}
+
+/* Estilo para la lista de productos */
+.historial-productos {
+    padding-left: 15px;
+    display: block;
+}
+
+/* Estilo para cada producto en la lista */
+.historial-producto-item {
+    display: inline-block;
+    margin-right: 8px;
+    margin-bottom: 3px;
+    padding: 2px 5px;
+    background-color: #f5f5f5;
+    border-radius: 3px;
+    font-size: 0.85rem;
+}
+
+/* Cambiar el botón azul (Editar) a verde */
+.btn-primary {
+    background-color: #28a745;  /* Color verde */
+    border-color: #28a745;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #218838;  /* Verde más oscuro al pasar el cursor */
+    border-color: #1e7e34;
+}
+
+/* Cambiar el botón rojo (Eliminar) a borde rojo con fondo blanco */
+.btn-danger {
+    background-color: white;
+    border-color: #dc3545;  /* Borde rojo */
+    color: #212529;  /* Texto negro */
+}
+
+.btn-danger:hover {
+    background-color: #f8f9fa;  /* Fondo gris claro al pasar el cursor */
+    border-color: #c82333;  /* Borde rojo más oscuro */
 }

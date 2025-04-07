@@ -1,0 +1,364 @@
+{% extends "layout.html" %}
+
+{% block title %}Resoluciones DIAN - PerfumEasy{% endblock %}
+
+{% block page_css %}
+    <!-- Archivo CSS específico para la página de resoluciones -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/resoluciones.css') }}">
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Barra lateral -->
+            <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block sidebar">
+                <div class="sidebar-sticky">
+                    <ul class="nav flex-column">
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard.index') }}">Inicio</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('productos.index') }}">Productos</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('clientes.index') }}">Clientes</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('empleados.index') }}">Empleados</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('facturas.index') }}">Facturas</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('transacciones.index') }}">Transacciones</a></li>
+                        <li class="nav-item"><a class="nav-link active" href="{{ url_for('resoluciondian.index') }}">Resoluciones DIAN</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#">Reportes</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#">Configuración</a></li>
+                        <li class="nav-item"><a id="logout" class="nav-link" href="{{ url_for('auth.logout') }}">Cerrar sesión</a></li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Contenido principal -->
+            <div role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
+                <h1 class="h2">Gestión de Resoluciones DIAN</h1>
+                
+                {% if error %}
+                <div class="alert alert-danger">
+                    {{ error }}
+                </div>
+                {% endif %}
+                
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <input type="text" id="search" class="form-control" placeholder="Buscar resoluciones...">
+                    </div>
+                    <div class="col-md-8 text-right">
+                        <button type="button" class="btn btn-success" onclick="openResolucionModal()">
+                            Añadir Resolución
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Modal de Nueva Resolución -->
+                <div class="modal fade" id="resolucionModal" tabindex="-1" role="dialog" aria-labelledby="resolucionModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="resolucionModalLabel">Nueva Resolución DIAN</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="resolucionForm">
+                                    <div class="form-group">
+                                        <label for="numeroResolucion">Número de Resolución*</label>
+                                        <input type="text" class="form-control" id="numeroResolucion" required>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label for="rangoInicial">Rango Inicial*</label>
+                                            <input type="number" class="form-control" id="rangoInicial" required min="1">
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label for="rangoFinal">Rango Final*</label>
+                                            <input type="number" class="form-control" id="rangoFinal" required min="2">
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label for="fechaInicial">Fecha Inicial*</label>
+                                            <input type="date" class="form-control" id="fechaInicial" required>
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label for="fechaFinal">Fecha Final*</label>
+                                            <input type="date" class="form-control" id="fechaFinal" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="custom-control custom-checkbox">
+                                            <input type="checkbox" class="custom-control-input" id="activarResolucion" checked>
+                                            <label class="custom-control-label" for="activarResolucion">
+                                                Activar esta resolución
+                                            </label>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                <button type="button" class="btn btn-primary" onclick="guardarResolucion()">Guardar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal de Detalles de Resolución -->
+                <div class="modal fade" id="detalleResolucionModal" tabindex="-1" role="dialog" aria-labelledby="detalleResolucionModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="detalleResolucionModalLabel">Detalles de Resolución DIAN</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body" id="detalleResolucionBody">
+                                <!-- Aquí se cargarán los detalles dinámicamente -->
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tabla de Resoluciones -->
+                <hr>
+                <h3 class="mt-4">Lista de Resoluciones DIAN</h3>
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Número</th>
+                                <th>Rango</th>
+                                <th>Número Actual</th>
+                                <th>Fecha Inicial</th>
+                                <th>Fecha Final</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for resolucion in resoluciones %}
+                                <tr>
+                                    <td>{{ resolucion.numero_resolucion }}</td>
+                                    <td>{{ resolucion.rango_inicial }} - {{ resolucion.rango_final }}</td>
+                                    <td>{{ resolucion.numero_actual }}</td>
+                                    <td>{{ resolucion.fecha_inicial.strftime('%d/%m/%Y') }}</td>
+                                    <td>{{ resolucion.fecha_final.strftime('%d/%m/%Y') }}</td>
+                                    <td>
+                                        {% if resolucion.activa %}
+                                            <span class="badge badge-success">Activa</span>
+                                        {% else %}
+                                            <span class="badge badge-secondary">Inactiva</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        {% if not resolucion.activa %}
+                                            <button class="btn btn-primary btn-sm" 
+                                                    onclick="activarResolucion({{ resolucion.id_resolucion }})">
+                                                Activar
+                                            </button>
+                                        {% endif %}
+                                        <button class="btn btn-info btn-sm"
+                                                onclick="verResolucion({{ resolucion.id_resolucion }})">
+                                            Ver
+                                        </button>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="7" class="text-center">
+                                        No hay resoluciones DIAN registradas. 
+                                        <a href="#" onclick="openResolucionModal()">Crear una ahora</a>.
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block page_js %}
+    <!-- Archivo JS específico para resoluciones -->
+    <script>
+        function openResolucionModal() {
+            // Establecer la fecha actual como valor por defecto
+            const hoy = new Date();
+            document.getElementById('fechaInicial').value = hoy.toISOString().split('T')[0];
+            
+            // Establecer la fecha final un año después por defecto
+            const fechaFinal = new Date();
+            fechaFinal.setFullYear(fechaFinal.getFullYear() + 1);
+            document.getElementById('fechaFinal').value = fechaFinal.toISOString().split('T')[0];
+            
+            $('#resolucionModal').modal('show');
+        }
+        
+        async function guardarResolucion() {
+            try {
+                // Recopilar datos del formulario
+                const datos = {
+                    numero_resolucion: document.getElementById('numeroResolucion').value,
+                    rango_inicial: parseInt(document.getElementById('rangoInicial').value),
+                    rango_final: parseInt(document.getElementById('rangoFinal').value),
+                    fecha_inicial: document.getElementById('fechaInicial').value,
+                    fecha_final: document.getElementById('fechaFinal').value,
+                    activar: document.getElementById('activarResolucion').checked
+                };
+                
+                // Validaciones básicas
+                if (!datos.numero_resolucion || !datos.rango_inicial || !datos.rango_final || !datos.fecha_inicial || !datos.fecha_final) {
+                    mostrarNotificacion('Por favor, complete todos los campos obligatorios', 'warning');
+                    return;
+                }
+                
+                if (datos.rango_inicial >= datos.rango_final) {
+                    mostrarNotificacion('El rango inicial debe ser menor al rango final', 'warning');
+                    return;
+                }
+                
+                // Enviar solicitud al servidor - RUTA CORREGIDA
+                const response = await fetch('/resoluciondian/api/resoluciones/crear', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(datos)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    mostrarNotificacion('Resolución DIAN guardada exitosamente', 'success');
+                    $('#resolucionModal').modal('hide');
+                    // Recargar la página para mostrar la nueva resolución
+                    setTimeout(() => { window.location.reload(); }, 1000);
+                } else {
+                    mostrarNotificacion('Error: ' + data.error, 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarNotificacion('Error al guardar la resolución: ' + error.message, 'error');
+            }
+        }
+        
+        async function activarResolucion(idResolucion) {
+            try {
+                // RUTA CORREGIDA
+                const response = await fetch(`/resoluciondian/api/resoluciones/activar/${idResolucion}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    mostrarNotificacion('Resolución DIAN activada exitosamente', 'success');
+                    // Recargar la página para reflejar el cambio
+                    setTimeout(() => { window.location.reload(); }, 1000);
+                } else {
+                    mostrarNotificacion('Error: ' + data.error, 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarNotificacion('Error al activar la resolución: ' + error.message, 'error');
+            }
+        }
+        
+        async function verResolucion(idResolucion) {
+            try {
+                // Obtener la lista de resoluciones - RUTA CORREGIDA
+                const response = await fetch('/resoluciondian/api/resoluciones/lista');
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Encontrar la resolución específica
+                    const resolucion = data.resoluciones.find(r => r.id === idResolucion);
+                    
+                    if (resolucion) {
+                        // Formatear el contenido
+                        const contenido = `
+                            <div class="card">
+                                <div class="card-body">
+                                    <h6 class="card-subtitle mb-2 text-muted">Información General</h6>
+                                    <p><strong>Número de Resolución:</strong> ${resolucion.numero_resolucion}</p>
+                                    <p><strong>Estado:</strong> ${resolucion.activa ? 'Activa' : 'Inactiva'}</p>
+                                    <p><strong>Vigente:</strong> ${resolucion.vigente ? 'Sí' : 'No'}</p>
+                                    
+                                    <h6 class="card-subtitle mb-2 text-muted mt-4">Rango de Numeración</h6>
+                                    <p><strong>Rango Inicial:</strong> ${resolucion.rango_inicial}</p>
+                                    <p><strong>Rango Final:</strong> ${resolucion.rango_final}</p>
+                                    <p><strong>Número Actual:</strong> ${resolucion.numero_actual}</p>
+                                    <p><strong>Facturas Disponibles:</strong> ${resolucion.rango_final - resolucion.numero_actual + 1}</p>
+                                    
+                                    <h6 class="card-subtitle mb-2 text-muted mt-4">Vigencia</h6>
+                                    <p><strong>Fecha Inicial:</strong> ${formatearFecha(resolucion.fecha_inicial)}</p>
+                                    <p><strong>Fecha Final:</strong> ${formatearFecha(resolucion.fecha_final)}</p>
+                                </div>
+                            </div>
+                        `;
+                        
+                        // Actualizar el contenido del modal
+                        document.getElementById('detalleResolucionBody').innerHTML = contenido;
+                        
+                        // Mostrar el modal
+                        $('#detalleResolucionModal').modal('show');
+                    } else {
+                        mostrarNotificacion('Resolución no encontrada', 'error');
+                    }
+                } else {
+                    mostrarNotificacion('Error al obtener las resoluciones', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarNotificacion('Error al obtener los detalles de la resolución', 'error');
+            }
+        }
+        
+        function formatearFecha(fechaISO) {
+            if (!fechaISO) return 'N/A';
+            const fecha = new Date(fechaISO);
+            return fecha.toLocaleDateString('es-CO');
+        }
+        
+        function mostrarNotificacion(mensaje, tipo = 'info') {
+            // Usar SweetAlert2 si está disponible
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    title: tipo.charAt(0).toUpperCase() + tipo.slice(1),
+                    text: mensaje,
+                    icon: tipo,
+                    timer: tipo === 'error' ? 0 : 3000,
+                    showConfirmButton: tipo === 'error'
+                });
+            } else {
+                // Fallback a alert nativo
+                alert(mensaje);
+            }
+        }
+        
+        // Función para buscar en la tabla
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('search');
+            if (searchInput) {
+                searchInput.addEventListener('keyup', function() {
+                    const searchValue = this.value.toLowerCase();
+                    const table = document.querySelector('table');
+                    const rows = table.querySelectorAll('tbody tr');
+                    
+                    rows.forEach(row => {
+                        const text = row.textContent.toLowerCase();
+                        row.style.display = text.includes(searchValue) ? '' : 'none';
+                    });
+                });
+            }
+        });
+    </script>
+{% endblock %}

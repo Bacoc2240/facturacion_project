@@ -1,40 +1,131 @@
+/* ===== ESTILOS GENERALES PARA FACTURAS ===== */
+
 /* Estilos para el modal de factura */
 .modal-header {
     background-color: #007bff;
     color: white;
 }
 
+/* Ajustes para el modal de factura */
+.modal-dialog.modal-lg {
+    max-height: 90vh;
+    margin: 1rem auto;
+}
+
+.modal-content {
+    max-height: calc(90vh - 2rem);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    padding: 0 !important; /* Sobreescribe el padding del styles.css */
+}
+
+.modal-body {
+    overflow-y: auto;
+    padding: 1rem;
+}
+
+/* Asegura que el formulario se comporte correctamente dentro del scroll */
+#facturaForm {
+    padding: 0 0.5rem;
+}
+
+/* Mantiene el header y footer del modal fijos */
+.modal-header, .modal-footer {
+    flex-shrink: 0;
+}
+
+/* ===== ESTILOS PARA BÚSQUEDA DE CLIENTES ===== */
+
+.suggestions-container {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    max-height: 200px;
+    overflow-y: auto;
+    display: none;
+}
+
+.sugerencia-cliente {
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.sugerencia-cliente:hover {
+    background-color: #f5f5f5;
+}
+
+.no-resultados {
+    padding: 12px;
+    text-align: center;
+}
+
+/* ===== ESTILOS ESPECÍFICOS PARA LA TABLA DE PRODUCTOS ===== */
+
+/* Estructura general de la tabla */
+#tablaProductos {
+    width: 100%;
+    margin-bottom: 0;
+    table-layout: fixed;
+}
+
+/* Asegurar que las celdas de encabezado y datos respeten los anchos definidos */
+#tablaProductos th, 
+#tablaProductos td {
+    vertical-align: middle !important;
+    padding: 0.3rem !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Alineación central para la columna de acciones */
+#tablaProductos th:last-child,
+#tablaProductos td:last-child {
+    text-align: center;
+}
+
+/* Estilos específicos para inputs y selects dentro de la tabla */
+#tablaProductos input.form-control,
+#tablaProductos select.form-control {
+    margin-bottom: 0 !important;
+    height: calc(1.5em + 0.5rem + 2px) !important;
+    padding: 0.25rem 0.5rem !important;
+    font-size: 0.875rem !important;
+}
+
+/* Estilo para el botón de eliminar producto */
+#tablaProductos .btn-danger {
+    padding: 0.25rem 0.5rem !important;
+    font-size: 0.875rem !important;
+    line-height: 1.5 !important;
+    min-width: auto !important;
+    width: auto !important;
+    margin-right: 0 !important;
+}
+
+/* Hacer visible el icono dentro del botón eliminar */
+#tablaProductos .fa-trash {
+    color: white !important;
+}
+
+/* ===== ESTILOS PARA EL FORMULARIO ===== */
+
 /* Estilos para el formulario de creación de facturas */
 #facturaForm .form-group label {
     font-weight: bold;
 }
 
-/* Ajuste del ancho de las columnas en la tabla */
-.producto-row .form-group {
-    padding-right: 5px;
-    padding-left: 5px;
-}
-
 /* Estilos para los inputs del formulario */
-#facturaForm input, #facturaForm select {
+#facturaForm input, 
+#facturaForm select {
     margin-bottom: 10px;
-}
-
-/* Estilos para la tabla de productos dentro del formulario de factura */
-.table-productos th, .table-productos td {
-    padding: 10px;
-    text-align: center;
-}
-
-.table-productos tfoot td {
-    font-weight: bold;
-}
-
-/* Estilos para el botón de agregar producto */
-#agregarProductoBtn {
-    margin-bottom: 20px;
-    background-color: #28a745;
-    color: white;
 }
 
 /* Estilos para el total a pagar en letras */
@@ -44,3 +135,116 @@
     margin-top: 10px;
 }
 
+/* Estilos adicionales para la página de facturas */
+
+/* Mejoras en la tabla de facturas */
+.table-facturas {
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 30px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+}
+
+.table-facturas thead th {
+    background-color: #f2f7f2;
+    color: #28a745;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    padding: 15px;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.table-facturas tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.table-facturas td {
+    padding: 15px;
+    vertical-align: middle;
+}
+
+/* Estilos para los botones de acción */
+.btn-accion {
+    background-color: #28a745;
+    border-color: #28a745;
+    color: white;
+    margin-right: 8px;
+    margin-bottom: 5px;
+    font-size: 0.85rem;
+    padding: 6px 12px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.btn-accion:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-accion:focus {
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+/* Estilos para campos de moneda */
+.campo-moneda {
+    text-align: right;
+    font-weight: 600;
+    font-family: 'Roboto Mono', monospace;
+}
+
+/* Estilos para los modales */
+.modal-content {
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.modal-title {
+    color: #28a745;
+    font-weight: 600;
+}
+
+/* Mejoras en los campos de formulario */
+.form-control:focus {
+    border-color: #28a745;
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+/* Estilos para la barra de búsqueda */
+#search {
+    border-radius: 20px;
+    padding-left: 15px;
+    transition: all 0.3s ease;
+}
+
+#search:focus {
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+    border-color: #28a745;
+}
+
+/* Mejoras para los contenedores de sugerencias */
+.suggestions-container {
+    border-radius: 4px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    max-height: 250px;
+}
+
+.sugerencia-cliente, .sugerencia-producto {
+    padding: 10px 15px;
+    transition: background-color 0.2s ease;
+}
+
+.sugerencia-cliente:hover, .sugerencia-producto:hover {
+    background-color: #f2f7f2;
+    cursor: pointer;
+}

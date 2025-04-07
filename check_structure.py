@@ -1,6 +1,6 @@
 import os
 
-# Guárdalo como check_structure.py y ejecútalo
+#  check_structure.py
 def check_project_structure():
     print("Verificando estructura del proyecto...")
     

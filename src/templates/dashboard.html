@@ -20,6 +20,7 @@
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('empleados.index') }}">Empleados</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('facturas.index') }}">Facturas</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('transacciones.index') }}">Transacciones</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('resoluciondian.index') }}"><i class="fas fa-file-invoice"></i> Resoluciones DIAN</a></li>
                     <!-- Añadir rutas para Reportes y Configuración cuando estén implementadas -->
                     <li class="nav-item"><a class="nav-link" href="#">Reportes</a></li>
                     <li class="nav-item"><a class="nav-link" href="#">Configuración</a></li>
@@ -39,6 +40,7 @@
                         <div class="card-header">Ventas Diarias</div>
                         <div class="card-body">
                             <!-- Agregar aquí un gráfico o datos de ventas diarias -->
+                            <canvas id="dailySalesChart"></canvas>
                         </div>
                     </div>
                 </div>
@@ -47,6 +49,7 @@
                         <div class="card-header">Productos Más Vendidos</div>
                         <div class="card-body">
                             <!-- Aquí voy a agregar una lista de productos más vendidos -->
+                            <canvas id="topProductsChart"></canvas>
                         </div>
                     </div>
                 </div>
@@ -76,6 +79,11 @@
 {% endblock %}
 
 {% block page_js %}
+    <!-- Archivo JS específico para el dashboard -->
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+
+    <!-- Incluir Chart.js desde CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Archivo JS específico para el dashboard -->
     <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
 

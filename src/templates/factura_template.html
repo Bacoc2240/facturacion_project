@@ -1,0 +1,343 @@
+{% extends "layout.html" %}
+
+{% block title %}Factura {{ factura.numero_factura }} - PERFUMERÍA ELLAS & ELLOS{% endblock %}
+
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/factura_print.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Botones de control (no se imprimirán) -->
+    <div class="row mb-3 no-print">
+        <div class="col-md-12">
+            <div class="d-flex justify-content-end">
+                <div class="btn-group">
+                    <button class="btn btn-primary mr-2" onclick="window.print()">
+                        <i class="fas fa-print"></i> Imprimir
+                    </button>
+                    <button class="btn btn-success mr-2" onclick="compartirFactura()">
+                        <i class="fas fa-share-alt"></i> Compartir
+                    </button>
+                    <button class="btn btn-secondary" onclick="window.location.href='/facturas/'">
+                        <i class="fas fa-arrow-left"></i> Volver
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Factura para impresión -->
+    <div class="factura-container" id="factura-imprimir">
+        <!-- Encabezado de la factura -->
+        <div class="factura-header">
+            <div class="row">
+                <div class="col-6 logo-container">
+                    <img src="{{ url_for('static', filename='images/Ellas_&_Ellos.jpeg') }}" alt="Logo" class="factura-logo">
+                </div>
+                <div class="col-6 empresa-info">
+                    <h3>PERFUMERÍA ELLAS & ELLOS</h3>
+                    <p>NIT: 800.100.200-1</p>
+                    <p>CC PLAZA REAL LOCAL 13</p>
+                    <p>PAMPLONA - NORTE DE SANTANDER</p>
+                    <p>ellasyellos@gmail.com</p>
+                    <p>6337150</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Título de la factura -->
+        <div class="factura-titulo">
+            <div class="row">
+                <div class="col-8">
+                    <h2>FACTURA ELECTRÓNICA DE VENTA N°</h2>
+                </div>
+                <div class="col-4">
+                    <div class="numero-factura">
+                        <span class="prefijo">PRE</span>
+                        <span class="numero">{{ factura.numero_factura }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Información del cliente -->
+        <div class="factura-cliente">
+            <div class="row">
+                <div class="col-md-6">
+                    <table class="table-info">
+                        <tr>
+                            <td class="label">Cliente:</td>
+                            <td>{{ cliente.nombre_cliente|default('No especificado') }}</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Nit:</td>
+                            <td>{{ cliente.id_cliente|default('N/A') }}</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Dirección:</td>
+                            <td>{{ cliente.direccion|default('N/A') }}</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Ciudad:</td>
+                            <td>{{ cliente.ciudad|default('PAMPLONA') }}</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Tel:</td>
+                            <td>{{ cliente.telefono|default('N/A') }}</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Correo:</td>
+                            <td>{{ cliente.correo_electronico|default('N/A') }}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <table class="table-info">
+                        <tr>
+                            <td class="label">Fecha Factura:</td>
+                            <td>{{ factura.fecha.strftime('%d/%m/%Y') if factura.fecha else 'N/A' }}</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Fecha Vencimiento:</td>
+                            <td>{{ factura.fecha.strftime('%d/%m/%Y') if factura.fecha else 'N/A' }}</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Forma de pago:</td>
+                            <td>{{ metodo_pago|default('CRÉDITO') }}</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Vendedor:</td>
+                            <td>{{ empleado.nombre|default('Vendedor no especificado') }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        {% if debug|default(false) %}
+        <div class="card bg-light mb-3 no-print">
+            <div class="card-header">Información de Depuración</div>
+            <div class="card-body">
+                <h5>Detalles disponibles: {{ detalles|length }}</h5>
+                <ul>
+                    {% for item in detalles %}
+                    <li>
+                        Detalle ID: {{ item.detalle.id }}, 
+                        Producto ID: {{ item.detalle.id_producto }},
+                        Producto Nombre: {{ item.producto.get('nombre', 'No disponible') }},
+                        Precio: {{ item.detalle.precio_unitario }},
+                        IVA: {{ item.porcentaje_iva }}%
+                    </li>
+                    {% endfor %}
+                </ul>
+                
+                <h5>Productos disponibles: {{ productos|length }}</h5>
+                <ul>
+                    {% for id, producto in productos.items() %}
+                    <li>ID: {{ id }}, Nombre: {{ producto.nombre }}, Categoría: {{ producto.categoria }}</li>
+                    {% endfor %}
+                </ul>
+                
+                <h5>Empleado:</h5>
+                <p>ID: {{ empleado.id_empleado|default('N/A') }}, Nombre: {{ empleado.nombre|default('No disponible') }}</p>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Tabla de productos -->
+        <div class="factura-productos">
+            <table class="table-productos">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Descripción</th>
+                        <th>Unid</th>
+                        <th>Cant</th>
+                        <th>V. Unit</th>
+                        <th>IVA</th>
+                        <th>Valor Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in detalles %}
+                    <tr>
+                        <td>{{ item.producto.get('codigo_barras', 'N/A') }}</td>
+                        <td>{{ item.producto.get('nombre', 'Producto no encontrado') }}</td>
+                        <td>
+                            {% set categoria = item.producto.get('categoria', '') %}
+                            {% if categoria == 'Perfumes' or categoria == 'Ambientadores' %}
+                                ml
+                            {% else %}
+                                UND
+                            {% endif %}
+                        </td>
+                        <td>{{ item.detalle.cantidad|default(0) }}</td>
+                        <td class="text-right">{{ '{:,.2f}'.format(item.detalle.precio_unitario|default(0)) }}</td>
+                        <td class="text-right">{{ item.porcentaje_iva|default(0) }}%</td>
+                        <td class="text-right">{{ '{:,.2f}'.format(item.detalle.subtotal|default(0)) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pie de factura con totales -->
+        <div class="factura-totales">
+            <div class="row">
+                <div class="col-7">
+                    <div class="valor-letras">
+                        <p><strong>VALOR EN LETRAS:</strong> {{ valor_en_letras }} M/CTE</p>
+                    </div>
+                    <div class="factura-nota">
+                        <p>A esta factura de venta aplican las normas relativas a la letra de cambio (artículo 5 Ley 1231 de 2008). Con este el Comprador declara haber recibido real y materialmente las mercancías o prestación de servicios descritos en este título - Valor.</p>
+                        <p><strong>Autorización de facturación No.</strong> 00165 <strong>aprobado en</strong> 2025-03-14 <strong>prefijo PRE desde el número</strong> 1 <strong>al</strong> 1000</p>
+                        <p>Régimen Común - Actividad Económica 4773</p>
+                        <p>No somos Agentes de Retención de IVA</p>
+                        <p>No somos Grandes Contribuyentes</p>
+                    </div>
+                </div>
+                <div class="col-5">
+                    <div class="totales-box">
+                        <h4>Totales</h4>
+                        <table class="table-totales">
+                            <tr>
+                                <td>Total Bruto</td>
+                                <td class="text-right">{{ '{:,.2f}'.format(factura_valores.subtotal|default(0)) }}</td>
+                            </tr>
+                            {% if factura_valores.IVA|default(0) > 0 %}
+                            <tr>
+                                <td>IVA</td>
+                                <td class="text-right">{{ '{:,.2f}'.format(factura_valores.IVA|default(0)) }}</td>
+                            </tr>
+                            {% endif %}
+                            <tr class="total-pagar">
+                                <td>Total a Pagar</td>
+                                <td class="text-right">$ {{ '{:,.2f}'.format(factura_valores.total|default(0)) }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Firmas -->
+        <div class="factura-firmas">
+            <div class="row">
+                <div class="col-6 text-center">
+                    <div class="firma-box">
+                        <div class="firma-linea"></div>
+                        <p>Elaborado por</p>
+                    </div>
+                </div>
+                <div class="col-6 text-center">
+                    <div class="firma-box">
+                        <div class="firma-linea"></div>
+                        <p>Firma Recibido</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pie de página -->
+        <div class="factura-footer">
+            <p class="original">ORIGINAL</p>
+            <p class="pagina">Página: 1 de 1</p>
+        </div>
+    </div>
+    <div id="factura-data" data-factura-id="{% if factura and factura.id %}{{ factura.id }}{% else %}0{% endif %}"></div>
+    <div id="facturaDetalleContainer" class="container-fluid mt-4">
+        <div id="notasAsociadasContainer" class="mt-4">
+            <!-- Las notas asociadas se cargarán aquí automáticamente -->
+        </div>
+    </div>
+</div>
+
+<!-- Modal para compartir por correo (se mostrará cuando sea necesario) -->
+<div class="modal fade no-print" id="compartirModal" tabindex="-1" role="dialog" aria-labelledby="compartirModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="compartirModalLabel">Compartir Factura</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info">
+                    <strong>Importante:</strong> Para compartir esta factura, puede guardarla como PDF desde la opción "Imprimir" y luego enviarla por correo.
+                </div>
+                <ol>
+                    <li>Haga clic en el botón "Imprimir"</li>
+                    <li>En el diálogo de impresión, seleccione "Guardar como PDF"</li>
+                    <li>Guarde el archivo y adjúntelo a su correo electrónico</li>
+                </ol>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="window.print()">Imprimir ahora</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_js %}
+
+<script src="{{ url_for('static', filename='js/notas_asociadas.js') }}"></script>
+
+<script>
+    // Recuperar el ID de la factura desde el atributo de datos
+    const facturaId = parseInt(document.getElementById('factura-data').getAttribute('data-factura-id')) || 0;
+    
+    // Función para mostrar el modal de compartir
+    function compartirFactura() {
+        $('#compartirModal').modal('show');
+    }
+    
+    // Inicializar NotasAsociadas manualmente con el ID de factura
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log("Inicializando NotasAsociadas con facturaId:", facturaId);
+        
+        // Si el módulo NotasAsociadas está cargado, inicializarlo manualmente
+        if (typeof NotasAsociadas !== 'undefined' && facturaId > 0) {
+            NotasAsociadas.crearSeccionNotas();
+            NotasAsociadas.cargarNotasAsociadas(facturaId);
+        } else {
+            console.warn('El módulo NotasAsociadas no está cargado o facturaId inválido:', facturaId);
+        }
+        
+        // Comprobar si hay un parámetro para imprimir automáticamente
+        if (window.location.href.includes('print=true')) {
+            setTimeout(function() {
+                window.print();
+            }, 1000); 
+        }
+    });
+</script>
+
+
+<script>
+    // Diagnóstico de notas asociadas
+    document.addEventListener('DOMContentLoaded', function() {
+        const facturaId = factura.id; // Asumiendo que 'factura' es un objeto ya definido
+        console.log("ID de factura:", facturaId);
+        
+        // Prueba directa a la API
+        fetch(`/notacredito/api/factura/${facturaId}/asociadas`)
+            .then(response => {
+                console.log("Estado de respuesta:", response.status);
+                return response.json();
+            })
+            .then(data => {
+                console.log("Datos recibidos:", data);
+                if (data.success && data.notas) {
+                    console.log("Notas encontradas:", data.notas.length);
+                }
+            })
+            .catch(error => {
+                console.error("Error al obtener notas:", error);
+            });
+    });
+</script>
+{% endblock %}
