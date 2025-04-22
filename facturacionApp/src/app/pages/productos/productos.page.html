@@ -1,0 +1,186 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-title>Gestión de Productos</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <!-- Barra de búsqueda y filtros -->
+  <div class="search-container">
+    <ion-searchbar placeholder="Buscar productos..." [(ngModel)]="searchTerm" (ionChange)="filterProductos()"></ion-searchbar>
+    
+    <div class="filter-controls">
+      <ion-select placeholder="Género" [(ngModel)]="generoFilter" (ionChange)="filterProductos()">
+        <ion-select-option value="">Todos</ion-select-option>
+        <ion-select-option value="Hombre">Hombre</ion-select-option>
+        <ion-select-option value="Mujer">Mujer</ion-select-option>
+        <ion-select-option value="Unisex">Unisex</ion-select-option>
+      </ion-select>
+
+      <ion-select placeholder="Categoría" [(ngModel)]="categoriaFilter" (ionChange)="filterProductos()">
+        <ion-select-option value="">Todas</ion-select-option>
+        <ion-select-option value="Perfumes">Perfumes</ion-select-option>
+        <ion-select-option value="Ambientadores">Ambientadores</ion-select-option>
+        <ion-select-option value="Accesorios">Accesorios</ion-select-option>
+      </ion-select>
+
+      <ion-select placeholder="Estado" [(ngModel)]="activoFilter" (ionChange)="filterProductos()">
+        <ion-select-option value="">Todos</ion-select-option>
+        <ion-select-option value="1">Activo</ion-select-option>
+        <ion-select-option value="0">Suspendido</ion-select-option>
+      </ion-select>
+    </div>
+    
+    <ion-button class="add-button" (click)="openProductoModal()">
+      <ion-icon name="add"></ion-icon>
+      Crear Producto
+    </ion-button>
+  </div>
+
+  <!-- Mensaje cuando no hay datos -->
+  <div *ngIf="!loading && filteredProductos.length === 0" class="ion-text-center ion-padding">
+    <p>No se encontraron productos que coincidan con los criterios de búsqueda.</p>
+    <ion-button expand="block" class="add-button" (click)="openProductoModal()">
+      <ion-icon name="add"></ion-icon>
+      Crear Producto
+    </ion-button>
+  </div>
+
+  <!-- Skeleton para carga -->
+  <div *ngIf="loading" class="loading-container">
+    <ion-skeleton-text animated style="width: 100%; height: 40px; margin-bottom: 8px;"></ion-skeleton-text>
+    <ion-skeleton-text animated style="width: 100%; height: 40px; margin-bottom: 8px;"></ion-skeleton-text>
+    <ion-skeleton-text animated style="width: 100%; height: 40px; margin-bottom: 8px;"></ion-skeleton-text>
+    <ion-skeleton-text animated style="width: 100%; height: 40px; margin-bottom: 8px;"></ion-skeleton-text>
+    <ion-skeleton-text animated style="width: 100%; height: 40px; margin-bottom: 8px;"></ion-skeleton-text>
+  </div>
+
+  <!-- Tabla de productos -->
+  <div class="table-responsive" *ngIf="!loading && filteredProductos.length > 0">
+    <table class="producto-table">
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Nombre</th>
+          <th>Género</th>
+          <th>Descripción</th>
+          <th>Stock</th>
+          <th>Precio</th>
+          <th>Categoría</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let producto of filteredProductos" class="producto-row" [ngClass]="{'inactive': !producto.activo}">
+          <td>{{ producto.codigo_barras }}</td>
+          <td>{{ producto.nombre }}</td>
+          <td>{{ producto.genero }}</td>
+          <td>{{ producto.descripcion | slice:0:50 }}{{ producto.descripcion.length > 50 ? '...' : '' }}</td>
+          <td>{{ producto.stock }}</td>
+          <td>{{ producto.precio | currency:'USD':'symbol':'1.2-2' }}</td>
+          <td>{{ producto.categoria || 'Sin categoría' }}</td>
+          <td>{{ producto.activo ? 'Activo' : 'Suspendido' }}</td>
+          <td>
+            <div class="action-buttons">
+              <ion-button size="small" class="edit-button" (click)="editProducto(producto.id)">
+                <ion-icon name="create"></ion-icon>
+              </ion-button>
+              
+              <ion-button *ngIf="producto.activo" size="small" class="delete-button" (click)="confirmSuspender(producto.id)">
+                <ion-icon name="ban"></ion-icon>
+              </ion-button>
+              
+              <ion-button *ngIf="!producto.activo" size="small" class="reactivate-button" (click)="confirmReactivar(producto.id)">
+                <ion-icon name="checkmark"></ion-icon>
+              </ion-button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Modal para Crear/Editar Producto -->
+  <ion-modal [isOpen]="showModal" (didDismiss)="closeModal()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar color="primary">
+          <ion-title>{{ isEditMode ? 'Editar Producto' : 'Crear Producto' }}</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="closeModal()">
+              <ion-icon name="close"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding">
+        <form [formGroup]="productoForm" (ngSubmit)="saveProducto()">
+          <ion-item>
+            <ion-label position="stacked">Nombre</ion-label>
+            <ion-input formControlName="nombre" type="text"></ion-input>
+            <ion-note slot="error" *ngIf="nombreControl?.invalid && nombreControl?.touched">
+              Ingrese un nombre válido
+            </ion-note>
+          </ion-item>
+          
+          <ion-item>
+            <ion-label position="stacked">Categoría</ion-label>
+            <ion-select formControlName="categoria">
+              <ion-select-option value="">Selecciona una categoría</ion-select-option>
+              <ion-select-option value="Perfumes">Perfumes</ion-select-option>
+              <ion-select-option value="Ambientadores">Ambientadores</ion-select-option>
+              <ion-select-option value="Accesorios">Accesorios</ion-select-option>
+            </ion-select>
+            <ion-note slot="error" *ngIf="categoriaControl?.invalid && categoriaControl?.touched">
+              Seleccione una categoría
+            </ion-note>
+          </ion-item>
+          
+          <ion-item>
+            <ion-label position="stacked">Stock</ion-label>
+            <ion-input formControlName="stock" type="number" min="0"></ion-input>
+            <ion-note slot="error" *ngIf="stockControl?.invalid && stockControl?.touched">
+              Ingrese un valor válido para el stock
+            </ion-note>
+          </ion-item>
+          
+          <ion-item>
+            <ion-label position="stacked">Género</ion-label>
+            <ion-select formControlName="genero">
+              <ion-select-option value="">Selecciona un género</ion-select-option>
+              <ion-select-option value="Hombre">Hombre</ion-select-option>
+              <ion-select-option value="Mujer">Mujer</ion-select-option>
+              <ion-select-option value="Unisex">Unisex</ion-select-option>
+            </ion-select>
+            <ion-note slot="error" *ngIf="generoControl?.invalid && generoControl?.touched">
+              Seleccione un género
+            </ion-note>
+          </ion-item>
+          
+          <ion-item>
+            <ion-label position="stacked">Precio</ion-label>
+            <ion-input formControlName="precio" type="number" step="0.01" min="0"></ion-input>
+            <ion-note slot="error" *ngIf="precioControl?.invalid && precioControl?.touched">
+              Ingrese un precio válido
+            </ion-note>
+          </ion-item>
+          
+          <ion-item>
+            <ion-label position="stacked">Descripción</ion-label>
+            <ion-textarea formControlName="descripcion" rows="3"></ion-textarea>
+            <ion-note slot="error" *ngIf="descripcionControl?.invalid && descripcionControl?.touched">
+              Ingrese una descripción válida
+            </ion-note>
+          </ion-item>
+          
+          <div class="ion-padding">
+            <ion-button expand="block" type="submit" [disabled]="productoForm.invalid">
+              Guardar
+            </ion-button>
+          </div>
+        </form>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+</ion-content>

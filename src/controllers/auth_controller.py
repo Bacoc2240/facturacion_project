@@ -1,15 +1,22 @@
-from flask import redirect, url_for, flash, render_template, request, session as flask_session
+from flask import redirect, url_for, flash, render_template, request, session as flask_session, jsonify
 from src.controllers.base_controller import FlaskController, route
 from datetime import datetime, timezone
 from src.models import session as db_session
 from src.models.usuario import Usuario, RolUsuario
 from src.password_utils import validar_contraseña
 from src.models.empleado import Empleado
+from flask_cors import cross_origin
 
 class AuthController(FlaskController):
     MAX_INTENTOS_FALLIDOS = 3
+    
+    def __init__(self):
+        super().__init__()
+        # Cambiamos el prefijo para que coincida con las rutas del cliente
+        # o dejamos sin prefijo para que sea relativo a la raíz
+        self.url_prefix = '/'
 
-    @route('/', methods=['GET', 'POST'])
+    @route('auth', methods=['GET', 'POST'])
     def login(self):
         print("Método de solicitud:", request.method)  # Log inicial
         
@@ -77,7 +84,117 @@ class AuthController(FlaskController):
                 return render_template('login.html')
         
         return render_template('login.html')
-    @route('/forgot_password', methods=['GET', 'POST'])
+
+    # Corregimos la ruta para que sea exactamente /api/login
+    @route('api/login', methods=['POST'])
+    @cross_origin(supports_credentials=True)
+    def api_login(self):
+        try:
+            print("Recibida solicitud en /api/login")  # Añadimos log para depurar
+            data = request.get_json()
+            print(f"Datos recibidos: {data}")  # Añadimos log para ver los datos
+            
+            if not data or 'username' not in data or 'password' not in data:
+                print("Datos incompletos en la solicitud")
+                return jsonify({
+                    'success': False, 
+                    'error': 'Datos incompletos'
+                }), 400
+                
+            username = data['username']
+            password = data['password']
+            
+            # Buscar usuario en la base de datos
+            user = db_session.query(Usuario).filter_by(nombre_usuario=username).first()
+            
+            if not user:
+                print(f"Usuario {username} no encontrado")
+                return jsonify({
+                    'success': False, 
+                    'error': 'Usuario no encontrado'
+                }), 401
+                
+            if not user.habilitado:
+                return jsonify({
+                    'success': False, 
+                    'error': f'Su cuenta ha sido deshabilitada. Causa: {user.causa_suspension}'
+                }), 401
+                
+            if not user.check_password(password):
+                user.intentos_fallidos += 1
+                
+                if user.intentos_fallidos >= self.MAX_INTENTOS_FALLIDOS:
+                    user.suspender_usuario("Exceso de intentos fallidos de inicio de sesión")
+                    db_session.commit()
+                    return jsonify({
+                        'success': False, 
+                        'error': 'Su cuenta ha sido suspendida por seguridad'
+                    }), 401
+                else:
+                    intentos_restantes = self.MAX_INTENTOS_FALLIDOS - user.intentos_fallidos
+                    db_session.commit()
+                    return jsonify({
+                        'success': False, 
+                        'error': f'Contraseña incorrecta. Intentos restantes: {intentos_restantes}'
+                    }), 401
+                    
+            # Si llegamos aquí, la autenticación fue exitosa
+            print(f"API Login exitoso para {username}")
+            user.intentos_fallidos = 0
+            user.ultima_sesion = datetime.now(timezone.utc)
+            
+            # Establecer la sesión
+            flask_session.clear()  # Limpiar cualquier sesión anterior
+            flask_session.permanent = True
+            flask_session['logged_in'] = True
+            flask_session['user_id'] = user.id_usuario
+            flask_session['user_role'] = user.rol.value
+            if hasattr(user, 'empleado') and user.empleado:
+                flask_session['empleado_id'] = user.empleado.id_empleado
+            flask_session['permisos'] = user.get_permissions()
+            
+            print("Sesión establecida:", dict(flask_session))
+            
+            # Guardar cambios en la base de datos
+            db_session.commit()
+            
+            return jsonify({
+                'success': True,
+                'user_id': user.id_usuario,
+                'user_role': user.rol.value,
+                'mensaje': 'Inicio de sesión exitoso'
+            })
+            
+        except Exception as e:
+            print(f"Error en API login: {str(e)}")
+            db_session.rollback()
+            return jsonify({
+                'success': False,
+                'error': f"Error interno: {str(e)}"
+            }), 500
+            
+    # Corregimos las rutas para que sean exactamente las esperadas por el cliente
+    @route('api/auth/status', methods=['GET'])
+    @cross_origin(supports_credentials=True)
+    def auth_status(self):
+        # Verificar el estado de autenticación actual
+        is_logged_in = flask_session.get('logged_in', False)
+        user_role = flask_session.get('user_role', None) if is_logged_in else None
+        user_id = flask_session.get('user_id', None) if is_logged_in else None
+        empleado_id = flask_session.get('empleado_id', None) if is_logged_in else None
+        permisos = flask_session.get('permisos', []) if is_logged_in else []
+        
+        print(f"Solicitud de estado de autenticación: {is_logged_in}")
+        
+        return jsonify({
+            'logged_in': is_logged_in,
+            'user_role': user_role,
+            'user_id': user_id,
+            'empleado_id': empleado_id,
+            'permisos': permisos
+        })
+    
+    @route('auth/forgot_password', methods=['GET', 'POST'])
     def forgot_password(self):
         """
         Maneja el proceso de recuperación de contraseña usando el correo electrónico
@@ -167,7 +284,7 @@ class AuthController(FlaskController):
             flash(f'Error al enviar el correo de recuperación: {str(e)}', 'danger')
             raise  # Re-lanzamos la excepción para manejarla en forgot_password
 
-    @route('/actualizar_credenciales', methods=['GET', 'POST'])
+    @route('auth/actualizar_credenciales', methods=['GET', 'POST'])
     def actualizar_credenciales(self):
         if not flask_session.get('logged_in'):
             return redirect(url_for('auth.login'))
@@ -200,8 +317,18 @@ class AuthController(FlaskController):
         
         return render_template('actualizar_credenciales.html')
 
-    @route('/logout', methods=['GET'])
+    @route('auth/logout', methods=['GET'])
     def logout(self):
         flask_session.clear()
         flash('Sesión cerrada exitosamente', 'success')
         return redirect(url_for('home.index'))
+        
+    # Corregimos la ruta para el logout de la API
+    @route('api/logout', methods=['GET'])
+    @cross_origin(supports_credentials=True)
+    def api_logout(self):
+        flask_session.clear()
+        return jsonify({
+            'success': True,
+            'mensaje': 'Sesión cerrada correctamente'
+        })

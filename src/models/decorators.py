@@ -2,6 +2,7 @@ from functools import wraps
 from flask import redirect, url_for, session as flask_session, jsonify
 from src.models import session  # Usar la sesión global
 from src.models.usuario import Usuario
+from flask_cors import cross_origin
 
 # Definición de roles y permisos
 ROLES = {
@@ -28,6 +29,7 @@ def check_permission(permission):
 
 def login_required(f):
     @wraps(f)
+    @cross_origin(supports_credentials=True)
     def decorated_function(*args, **kwargs):
         print("Verificando estado de sesión...")
         print("Contenido actual de la sesión:", dict(flask_session))

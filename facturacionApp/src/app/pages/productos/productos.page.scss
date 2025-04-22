@@ -1,0 +1,144 @@
+/* productos.page.scss */
+/* Estilos para la tabla de productos */
+.producto-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .producto-table thead th {
+    background-color: #f4f5f8;
+    padding: 12px 8px;
+    text-align: left;
+    font-weight: 600;
+    border-bottom: 2px solid #ddd;
+  }
+  
+  .producto-table tbody td {
+    padding: 12px 8px;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+  }
+  
+  /* Estilos para el contenedor de búsqueda y filtros */
+  .search-container {
+    display: flex;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  
+  .search-container ion-searchbar {
+    flex: 2;
+    min-width: 200px;
+    --background: #fff;
+    --box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    --border-radius: 5px;
+  }
+  
+  .filter-controls {
+    flex: 3;
+    display: flex;
+    gap: 8px;
+  }
+  
+  .filter-controls ion-select {
+    background: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Estilos para botones de acción */
+  .action-buttons {
+    display: flex;
+    gap: 8px;
+  }
+  
+  .add-button {
+    --background: #28a745;
+    --background-activated: #218838;
+    --background-hover: #218838;
+    --color: white;
+  }
+  
+  .edit-button {
+    --background: transparent;
+    --color: #ffc107;
+    --box-shadow: none;
+    --border-color: #ffc107;
+    --border-style: solid;
+    --border-width: 1px;
+  }
+  
+  .delete-button {
+    --background: transparent;
+    --color: #dc3545;
+    --box-shadow: none;
+    --border-color: #dc3545;
+    --border-style: solid;
+    --border-width: 1px;
+  }
+  
+  .reactivate-button {
+    --background: transparent;
+    --color: #28a745;
+    --box-shadow: none;
+    --border-color: #28a745;
+    --border-style: solid;
+    --border-width: 1px;
+  }
+  
+  /* Estilos para el estado de carga */
+  .loading-container {
+    width: 100%;
+  }
+  
+  .producto-row {
+    background-color: white;
+    transition: background-color 0.2s;
+  }
+  
+  .producto-row:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+  
+  .producto-row.inactive {
+    background-color: rgba(0, 0, 0, 0.05);
+    color: #666;
+  }
+  
+  /* Estilos para el formulario */
+  ion-modal form {
+    --background: #f8f9fa;
+  }
+  
+  ion-modal ion-item {
+    margin-bottom: 10px;
+    --background: #ffffff;
+    --border-radius: 5px;
+  }
+  
+  /* Responsive para dispositivos pequeños */
+  @media (max-width: 768px) {
+    .search-container {
+      flex-direction: column;
+    }
+    
+    .filter-controls {
+      flex-direction: column;
+    }
+    
+    .producto-table {
+      font-size: 0.9rem;
+    }
+    
+    .producto-table thead th:nth-child(3), 
+    .producto-table tbody td:nth-child(3),
+    .producto-table thead th:nth-child(4), 
+    .producto-table tbody td:nth-child(4),
+    .producto-table thead th:nth-child(7), 
+    .producto-table tbody td:nth-child(7) {
+      display: none;
+    }
+  }
